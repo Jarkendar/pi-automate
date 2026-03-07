@@ -1,0 +1,11 @@
+# n8n database, encryption keys, and session files (CRITICAL: DO NOT COMMIT!)
+n8n_data/
+
+# Environment variables and secrets
+.env
+
+# System junk and logs
+*.log
+.DS_Store
+npm-debug.log*
+node_modules/
