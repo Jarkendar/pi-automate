@@ -15,6 +15,8 @@ services:
       # Change timezone to yours if needed (important for schedules/cron)
       - GENERIC_TIMEZONE=Europe/Warsaw
       - TZ=Europe/Warsaw
+    env_file:
+      - .env
     volumes:
       # n8n database and configuration (ignored by Git)
       - ./n8n_data:/home/node/.n8n
