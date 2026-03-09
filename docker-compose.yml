@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
+    image: n8nio/n8n:2.10.4
     container_name: n8n_pi_automate
     restart: unless-stopped
     ports:
@@ -12,15 +10,34 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      # Change timezone to yours if needed (important for schedules/cron)
-      - GENERIC_TIMEZONE=Europe/Warsaw
-      - TZ=Europe/Warsaw
+      - N8N_RUNNERS_MODE=external
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
     env_file:
       - .env
     volumes:
-      # n8n database and configuration (ignored by Git)
+      # n8n database and conenv_file:figuration (ignored by Git)
       - ./n8n_data:/home/node/.n8n
       # Location for your exported workflows (versioned in Git)
       - ./workflows:/home/node/workflows
       # Location for potential scripts (e.g., Bash/Python)
       - ./scripts:/home/node/scripts
+    networks:
+      - n8n-network
+
+  n8n-python-runner:
+    image: n8nio/runners:2.10.4
+    container_name: n8n_worker
+    restart: unless-stopped
+    environment:
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n_pi_automate:5679
+    env_file:
+      - .env
+    networks:
+      - n8n-network
+    depends_on:
+      - n8n
+
+networks:
+  n8n-network:
+    driver: bridge
