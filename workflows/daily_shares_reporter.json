@@ -1,0 +1,697 @@
+{
+  "name": "daily_shares_reporter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": {}
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -480,
+        144
+      ],
+      "id": "f14974ee-247b-4eb3-a7b5-a3b2377c87e5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "wallet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "2e4eb57a-f7c1-4bba-8cb2-56b5470339b5",
+      "name": "Get shares from wallet",
+      "credentials": {
+        "googleApi": {
+          "id": "aU5e7kbJ60QxrOIv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v8/finance/chart/{{ $json.Symbol }}?range=1y&interval=1d",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -64,
+        144
+      ],
+      "id": "d66d961a-85f9-4621-aec1-7942a9aee315",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ Math.abs($json[\"Trend_1D [%]\"]) }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "id": "38dc4220-6b0a-42a2-b17d-8952dc6cdccd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fast change -> suspend"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "23e577da-be24-4c54-bbdc-1356903db848",
+                    "leftValue": "={{ Math.abs($json[\"Trend_1D [%]\"]) }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Save"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        144
+      ],
+      "id": "cedbab0f-90b3-4b30-b508-0691ec7c19b0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Jesteś analitykiem giełdowym. Twoim zadaniem jest analiza newsów i danych spółki.\nZwróć TYLKO czysty kod JSON, bez żadnych dodatkowych opisów czy markdownowych znaczników typu ```json.\nJSON o strukturze:\n{\n  \"Symbol\": \"TICKER_SPOLKI\",\n  \"importance\": number,\n  \"description\": \"string\"\n}\n\nKRYTERIA WAŻNOŚCI (Level of importance [0-10]):\n- 8-10: Krytyczne wydarzenia (wyniki finansowe, fuzje, skandale, zmiana CEO, przełomowe produkty). Wymaga pilnej uwagi.\n- 6-7: Istotne info (duże korekty, ważne komunikaty giełdowe)\n- 4-5: Mało istotne info (korekty techniczne, ogólne trendy sektorowe, mniejsze komunikaty giełdowe).\n- 0-3: Szum rynkowy (brak konkretnych newsów, zwykła zmienność, ruchy zgodne z całym indeksem).\n\nZASADY OPISU (description):\n- Maksymalnie 3-4 zdania po polsku.\n- Chłodny ton, zero \"lania wody\".\n- Wyjaśnij konkretnie \"dlaczego\" cena się ruszyła na podstawie Google Search.",
+              "role": "model"
+            },
+            {
+              "content": "=Oto surowe dane rynkowe do analizy:\n{{ JSON.stringify($json, null, 2) }}\n\nLEGENDA:\n- Symbol: Ticker spółki.\n- Current_Price: Cena zamknięcia.\n- 1D, 7D, 30D, 1Y: Zmiany procentowe (wartość 5 = 5%).\n- [PLN], [USD], [%]: Jednostki danych.\n\nZADANIE:\nDzisiejsza data to: {{ $now.format('yyyy-MM-dd') }}.\n1. Użyj Google Search, aby znaleźć najświeższe newsy. Zignoruj całkowicie artykuły starsze niż 3 dni. Jeśli Google zwraca tylko stare informacje z 2023, 2024 lub 2025 roku, uznaj, że NIE MA świeżych newsów i napisz o tym wprost (Ważność 0-2).\n2. Oceń poziom ważności (0-10) i napisz krótkie wyjaśnienie.\n3. Zwróć wynik jako JSON z polami \"importance\" oraz \"description\"."
+            }
+          ]
+        },
+        "builtInTools": {
+          "googleSearch": true
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        -112
+      ],
+      "id": "7aed1793-6458-44b6-b5c1-f49a4577fdec",
+      "name": "Search info about fast change",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SUoPoszkJZp8LMRp",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Jesteś analitykiem giełdowym. Twoim zadaniem jest analiza newsów i danych spółki.\nZwróć TYLKO czysty kod JSON, bez żadnych dodatkowych opisów czy markdownowych znaczników typu ```json.\nJSON o strukturze:\n{\n  \"Symbol\": \"TICKER_SPOLKI\",\n  \"importance\": number,\n  \"description\": \"string\"\n}\n\nKRYTERIA WAŻNOŚCI (Level of importance [0-10]):\n- 8-10: Krytyczne wydarzenia (wyniki finansowe, fuzje, skandale, zmiana CEO, przełomowe produkty). Wymaga pilnej uwagi.\n- 6-7: Istotne info (duże korekty, ważne komunikaty giełdowe)\n- 4-5: Mało istotne info (korekty techniczne, ogólne trendy sektorowe, mniejsze komunikaty giełdowe).\n- 0-3: Szum rynkowy (brak konkretnych newsów, zwykła zmienność, ruchy zgodne z całym indeksem).\n\nZASADY OPISU (description):\n- Maksymalnie 1 zdanie.\n- Chłodny ton, zero \"lania wody\".",
+              "role": "model"
+            },
+            {
+              "content": "=Oto surowe dane rynkowe do analizy:\n{{ JSON.stringify($json, null, 2) }}\n\nLEGENDA:\n- Symbol: Ticker spółki.\n- Current_Price: Cena zamknięcia.\n- 1D, 7D, 30D, 1Y: Zmiany procentowe (wartość 5 = 5%).\n- [PLN], [USD], [%]: Jednostki danych.\n\nINSTRUKCJA WYKONAWCZA:\nDzisiejsza data to: {{ $now.format('yyyy-MM-dd') }}.\n1. Użyj Google Search, aby znaleźć najświeższe newsy. Zignoruj całkowicie artykuły starsze niż 3 dni. Jeśli Google zwraca tylko stare informacje, uznaj, że NIE MA świeżych newsów i napisz o tym wprost (Ważność 0-2).\n2. Zidentyfikuj wydarzenia z ostatniego dnia.\n3. Oceń wagę tych informacji w skali 0-10 zgodnie z poniższymi kryteriami."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        400
+      ],
+      "id": "8bc84e65-7f91-4726-88cc-29588058a0df",
+      "name": "Company info",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SUoPoszkJZp8LMRp",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "results = []\n\nfor item in _items:\n    try:\n        data = item['json']\n        if isinstance(data, list):\n            data = data[0]\n\n        result_data = data['chart']['result'][0]\n        symbol = result_data['meta']['symbol']\n        \n        raw_prices = result_data['indicators']['quote'][0]['close']\n        \n        clean_prices = [price for price in raw_prices if price is not None]\n        \n        if not clean_prices:\n            results.append({\"json\": {\"Symbol\": symbol, \"Error\": \"Brak danych cenowych\"}})\n            continue\n\n        current = clean_prices[-1]\n        \n        t1d = ((current - clean_prices[-2]) / clean_prices[-2] * 100) if len(clean_prices) >= 2 and clean_prices[-2] != 0 else 0\n        t7d = ((current - clean_prices[-6]) / clean_prices[-6] * 100) if len(clean_prices) >= 6 and clean_prices[-6] != 0 else 0\n        t30d = ((current - clean_prices[-22]) / clean_prices[-22] * 100) if len(clean_prices) >= 22 and clean_prices[-22] != 0 else 0\n        t1y = ((current - clean_prices[0]) / clean_prices[0] * 100) if len(clean_prices) >= 1 and clean_prices[0] != 0 else 0\n\n        results.append({\n            \"json\": {\n                \"Symbol\": symbol,\n                \"Current_Price\": round(current, 2),\n                \"Trend_1D [%]\": round(t1d, 2),\n                \"Trend_7D [%]\": round(t7d, 2),\n                \"Trend_30D [%]\": round(t30d, 2),\n                \"Trend_1Y [%]\": round(t1y, 2)\n            }\n        })\n        \n    except Exception as e:\n        results.append({\"json\": {\"Error\": str(e), \"Context\": \"Błąd parsowania danych Yahoo\"}})\n\nreturn results"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        144
+      ],
+      "id": "619720ca-b7d7-4515-9035-eedce9e92988",
+      "name": "Count data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  let rawText = \"\";\n  if (item.json.text) {\n    rawText = item.json.text;\n  } else if (item.json.content && item.json.content.parts && item.json.content.parts[0].text) {\n    rawText = item.json.content.parts[0].text;\n  }\n\n  const jsonMatch = rawText.match(/\\{[\\s\\S]*\\}/);\n  \n  let importance = 0;\n  let description = \"Error: JSON not found\";\n  let symbol = \"UNKNOWN\";\n\n  if (jsonMatch) {\n    try {\n      const parsed = JSON.parse(jsonMatch[0]);\n      importance = parsed.importance ?? 0;\n      description = parsed.description ?? \"No description\";\n      symbol = parsed.Symbol ?? \"UNKNOWN\"; // Pobieramy klucz!\n    } catch (e) {\n      description = \"Parse Error: \" + e.message;\n    }\n  }\n\n  return {\n    json: {\n      Symbol: symbol,\n      importance,\n      description\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        112
+      ],
+      "id": "e7711380-c80c-4c68-b889-ce0477c35f1c",
+      "name": "Parse respond"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobieramy całą listę z odpowiedziami AI z poprzedniego węzła\nconst aiResults = $input.all();\n\n// Pobieramy całą listę z danymi giełdowymi (upewnij się, że nazwa węzła jest poprawna!)\nconst stockDataList = $('Count data').all();\n\nconst now = new Date();\nconst formattedDate = now.toISOString().replace('T', ' ').substring(0, 16);\n\nlet finalResults = [];\n\n// Przechodzimy przez każdy wynik od AI\nfor (const aiItem of aiResults) {\n  const aiSymbol = aiItem.json.Symbol;\n  \n  // WYSZUKIWANIE: Szukamy w danych giełdowych obiektu z tym samym symbolem\n  const matchingStock = stockDataList.find(stock => stock.json.Symbol === aiSymbol);\n\n  // Jeśli znaleźliśmy dopasowanie, tworzymy finalny obiekt\n  if (matchingStock) {\n    finalResults.push({\n      json: {\n        \"Date\": formattedDate,\n        \"Symbol\": aiSymbol,\n        \"Shares price\": matchingStock.json[\"Current_Price\"],\n        \"Level of importance [0-10]\": aiItem.json.importance,\n        \"Trend 1D [%]\": matchingStock.json[\"Trend_1D [%]\"],\n        \"Trend 7D [%]\": matchingStock.json[\"Trend_7D [%]\"],\n        \"Trend 30D [%]\": matchingStock.json[\"Trend_30D [%]\"],\n        \"Trend 1Y [%]\": matchingStock.json[\"Trend_1Y [%]\"],\n        \"LLM description\": aiItem.json.description\n      }\n    });\n  }\n}\n\nreturn finalResults;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        112
+      ],
+      "id": "f72c3c99-f838-4732-8729-9da39f876af0",
+      "name": "Prepare data to save history"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit?gid=753895271#gid=753895271",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 753895271,
+          "mode": "list",
+          "cachedResultName": "history_workflow_data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=753895271"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Date": "={{ $json.Date }}",
+            "Symbol": "={{ $json.Symbol }}",
+            "Shares price": "={{ $json[\"Shares price\"] }}",
+            "Level of importance [0-10]": "={{ $json[\"Level of importance [0-10]\"] }}",
+            "Trend 1D [%]": "={{ $json[\"Trend 1D [%]\"] }}",
+            "Trend 7D [%]": "={{ $json[\"Trend 7D [%]\"] }}",
+            "Trend 30D [%]": "={{ $json[\"Trend 30D [%]\"] }}",
+            "Trend 1Y [%]": "={{ $json[\"Trend 1Y [%]\"] }}",
+            "LLM description": "={{ $json[\"LLM description\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Symbol",
+              "displayName": "Symbol",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Shares price",
+              "displayName": "Shares price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Level of importance [0-10]",
+              "displayName": "Level of importance [0-10]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trend 1D [%]",
+              "displayName": "Trend 1D [%]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trend 7D [%]",
+              "displayName": "Trend 7D [%]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trend 30D [%]",
+              "displayName": "Trend 30D [%]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trend 1Y [%]",
+              "displayName": "Trend 1Y [%]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LLM description",
+              "displayName": "LLM description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1456,
+        112
+      ],
+      "id": "f8691f61-8617-47ab-8844-5c2987177f5a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "aU5e7kbJ60QxrOIv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "65af9964-36a6-4e9f-8931-73b16038c5e9",
+              "leftValue": "={{ $json[\"Level of importance [0-10]\"] }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1664,
+        112
+      ],
+      "id": "ee2cfbbb-6f7c-4da1-b76b-fe7cb03d73aa",
+      "name": "Is importance"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {
+          "includeBinaries": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        368
+      ],
+      "id": "2c626da7-7a8e-4a05-bca8-7e9576b38daa",
+      "name": "Wait for all"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tworzymy prostą tabelę HTML z wynikami\nlet html = '<table border=\"1\" style=\"border-collapse: collapse; width: 100%;\">';\nhtml += '<tr style=\"background-color: #f2f2f2;\"><th>Symbol</th><th>Ważność</th><th>Analiza</th></tr>';\n\nfor (const item of $input.all()[0].json.data) { // 'data' to nazwa pola z węzła Aggregate\n  html += `<tr>\n    <td style=\"padding: 8px;\">${item.Symbol}</td>\n    <td style=\"padding: 8px;\">${item[\"Level of importance [0-10]\"]}</td>\n    <td style=\"padding: 8px;\">${item[\"LLM description\"]}</td>\n  </tr>`;\n}\nhtml += '</table>';\n\nreturn { html_report: html };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        368
+      ],
+      "id": "c8500092-a5ba-419e-92fa-d997bd0bc758",
+      "name": "Format report"
+    },
+    {
+      "parameters": {
+        "fromEmail": "N8N Agent <your email>",
+        "toEmail": "your email",
+        "subject": "=PILNE: Gwałtowny ruch na {{ $json.Symbol }} (Ważność: {{ $json[\"Level of importance [0-10]\"] }})",
+        "html": "=<h3>Wykryto istotną zmianę dla spółki {{ $json.Symbol }}</h3> <p><b>Aktualna cena:</b> {{ $json[\"Shares price\"] }}</p> <p><b>Zmiana 1D:</b> {{ $json[\"Trend 1D [%]\"] }}%</p> <p><b>Analiza AI:</b> {{ $json[\"LLM description\"] }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1872,
+        -48
+      ],
+      "id": "c6dba02a-f82e-4fbe-81ba-c564452f28b4",
+      "name": "Send importance email",
+      "webhookId": "fd9c53ad-7548-4e65-912e-b8a9562af10c",
+      "credentials": {
+        "smtp": {
+          "id": "e2B7B8MpOj8P6lyN",
+          "name": "N8N bot Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "N8N Agent <your email>",
+        "toEmail": "your email",
+        "subject": "=📊 Raport zbiorczy z analizy rynku - {{ $now.format('yyyy-MM-dd') }}",
+        "html": "={{ $json.html_report }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2096,
+        368
+      ],
+      "id": "ab0c569b-7c56-42e8-aa6b-51491f6b94bd",
+      "name": "Send Daily Report",
+      "webhookId": "a3ecbe7d-d853-426b-8922-037aa178de56",
+      "credentials": {
+        "smtp": {
+          "id": "e2B7B8MpOj8P6lyN",
+          "name": "N8N bot Gmail"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get shares from wallet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get shares from wallet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Count data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Search info about fast change",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Company info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search info about fast change": {
+      "main": [
+        [
+          {
+            "node": "Parse respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company info": {
+      "main": [
+        [
+          {
+            "node": "Parse respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse respond": {
+      "main": [
+        [
+          {
+            "node": "Prepare data to save history",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data to save history": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait for all",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is importance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is importance": {
+      "main": [
+        [
+          {
+            "node": "Send importance email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for all": {
+      "main": [
+        [
+          {
+            "node": "Format report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format report": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5c8a4772-aa1b-4888-b9a2-1f918999cb7d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
+  },
+  "id": "RztLg1vJyg0fCZsR",
+  "tags": [
+    {
+      "name": "Shares",
+      "id": "iYf88aLPlKsbWotv",
+      "updatedAt": "2026-03-10T13:28:11.950Z",
+      "createdAt": "2026-03-10T13:28:11.950Z"
+    },
+    {
+      "name": "AI",
+      "id": "Q1I4mcXffkxC0as2",
+      "updatedAt": "2026-03-10T13:28:14.729Z",
+      "createdAt": "2026-03-10T13:28:14.729Z"
+    },
+    {
+      "name": "mail",
+      "id": "Klwdshp6NtGybcZK",
+      "updatedAt": "2026-03-10T13:28:28.779Z",
+      "createdAt": "2026-03-10T13:28:28.779Z"
+    }
+  ]
+}
