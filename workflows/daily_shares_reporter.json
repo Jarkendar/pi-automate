@@ -26,7 +26,7 @@
         "authentication": "serviceAccount",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit?gid=0#gid=0",
+          "value": "https://docs.google.com/spreadsheets/<your file>",
           "mode": "url"
         },
         "sheetName": {
@@ -34,7 +34,7 @@
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "wallet",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=0"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/<your file>"
         },
         "options": {}
       },
@@ -266,7 +266,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit?gid=753895271#gid=753895271",
+          "value": "https://docs.google.com/spreadsheets/<your file>",
           "mode": "url"
         },
         "sheetName": {
@@ -274,7 +274,7 @@
           "value": 753895271,
           "mode": "list",
           "cachedResultName": "history_workflow_data",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=753895271"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/<your file>"
         },
         "columns": {
           "mappingMode": "autoMapInputData",
