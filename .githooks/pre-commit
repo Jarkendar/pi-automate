@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# ==========================================
+# Pre-Commit Hook: Secret Leak Detection
+# ==========================================
+
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+# 1. Regex pattern for email addresses
+REGEX_EMAIL="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+
+# 2. Universal regex pattern for passwords, tokens, and API keys.
+# Detects keywords before a colon (:) or equals sign (=)
+REGEX_SECRETS="(password|secret|api_?key|token|credential)[a-zA-Z0-9_-]*[\"']?\s*[:=]\s*[\"']?[a-zA-Z0-9\-_=+]{5,}[\"']?"
+
+# Get ALL files scheduled for commit (excluding deleted ones)
+FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Exit successfully if no files are being committed
+if [ -z "$FILES" ]; then
+    exit 0
+fi
+
+echo -e "${YELLOW}🔍 Scanning files for potential leaks (emails, passwords, tokens)...${NC}"
+SECRET_FOUND=0
+
+for FILE in $FILES; do
+    
+    # Ensure it's a regular file (skip symlinks, directories, etc.)
+    if [ ! -f "$FILE" ]; then
+        continue
+    fi
+
+    # --- EMAIL SCANNING ---
+    # The -I flag ignores binary files (e.g., images, PDFs)
+    MAILS=$(grep -I -E -i -n -o "$REGEX_EMAIL" "$FILE")
+    if [ ! -z "$MAILS" ]; then
+        while IFS= read -r match; do
+            LINE_NUM=$(echo "$match" | cut -d: -f1)
+            DETECTED=$(echo "$match" | cut -d: -f2-)
+            # Required format: <detected secret>: <file>:<line>
+            echo -e "${RED}${DETECTED}: ${FILE}:${LINE_NUM}${NC}"
+            SECRET_FOUND=1
+        done <<< "$MAILS"
+    fi
+
+    # --- PASSWORD / TOKEN SCANNING ---
+    SECRETS=$(grep -I -E -i -n -o "$REGEX_SECRETS" "$FILE")
+    if [ ! -z "$SECRETS" ]; then
+        while IFS= read -r match; do
+            LINE_NUM=$(echo "$match" | cut -d: -f1)
+            DETECTED=$(echo "$match" | cut -d: -f2-)
+            # Required format: <detected secret>: <file>:<line>
+            echo -e "${RED}${DETECTED}: ${FILE}:${LINE_NUM}${NC}"
+            SECRET_FOUND=1
+        done <<< "$SECRETS"
+    fi
+
+done
+
+# Block the commit if any secrets were found
+if [ $SECRET_FOUND -eq 1 ]; then
+    echo -e "\n${RED}🛑 Commit blocked! Potential sensitive data found.${NC}"
+    echo -e "Please remove or mask them, then try again."
+    exit 1
+fi
+
+exit 0
