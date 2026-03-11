@@ -7,7 +7,7 @@
           "interval": [
             {
               "triggerAtHour": 8,
-              "triggerAtMinute": {}
+              "triggerAtMinute": null
             }
           ]
         }
@@ -26,7 +26,7 @@
         "authentication": "serviceAccount",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/<your file>",
+          "value": "={{ $env.SHARES_GOOGLE_SHEET_LINK }}",
           "mode": "url"
         },
         "sheetName": {
@@ -34,7 +34,7 @@
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "wallet",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/<your file>"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=0"
         },
         "options": {}
       },
@@ -236,7 +236,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map(item => {\n  let rawText = \"\";\n  if (item.json.text) {\n    rawText = item.json.text;\n  } else if (item.json.content && item.json.content.parts && item.json.content.parts[0].text) {\n    rawText = item.json.content.parts[0].text;\n  }\n\n  const jsonMatch = rawText.match(/\\{[\\s\\S]*\\}/);\n  \n  let importance = 0;\n  let description = \"Error: JSON not found\";\n  let symbol = \"UNKNOWN\";\n\n  if (jsonMatch) {\n    try {\n      const parsed = JSON.parse(jsonMatch[0]);\n      importance = parsed.importance ?? 0;\n      description = parsed.description ?? \"No description\";\n      symbol = parsed.Symbol ?? \"UNKNOWN\"; // Pobieramy klucz!\n    } catch (e) {\n      description = \"Parse Error: \" + e.message;\n    }\n  }\n\n  return {\n    json: {\n      Symbol: symbol,\n      importance,\n      description\n    }\n  };\n});"
+        "jsCode": "return $input.all().map(item => {\n  let rawText = \"\";\n  if (item.json.text) {\n    rawText = item.json.text;\n  } else if (item.json.content && item.json.content.parts && item.json.content.parts[0].text) {\n    rawText = item.json.content.parts[0].text;\n  }\n\n  const jsonMatch = rawText.match(/\\{[\\s\\S]*\\}/);\n  \n  let importance = 0;\n  let description = \"Error: JSON not found\";\n  let symbol = \"UNKNOWN\";\n\n  if (jsonMatch) {\n    try {\n      const parsed = JSON.parse(jsonMatch[0]);\n      importance = parsed.importance ?? 0;\n      description = parsed.description ?? \"No description\";\n      symbol = parsed.Symbol ?? \"UNKNOWN\";\n    } catch (e) {\n      description = \"Parse Error: \" + e.message;\n    }\n  }\n\n  return {\n    json: {\n      Symbol: symbol,\n      importance,\n      description\n    }\n  };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -249,7 +249,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobieramy całą listę z odpowiedziami AI z poprzedniego węzła\nconst aiResults = $input.all();\n\n// Pobieramy całą listę z danymi giełdowymi (upewnij się, że nazwa węzła jest poprawna!)\nconst stockDataList = $('Count data').all();\n\nconst now = new Date();\nconst formattedDate = now.toISOString().replace('T', ' ').substring(0, 16);\n\nlet finalResults = [];\n\n// Przechodzimy przez każdy wynik od AI\nfor (const aiItem of aiResults) {\n  const aiSymbol = aiItem.json.Symbol;\n  \n  // WYSZUKIWANIE: Szukamy w danych giełdowych obiektu z tym samym symbolem\n  const matchingStock = stockDataList.find(stock => stock.json.Symbol === aiSymbol);\n\n  // Jeśli znaleźliśmy dopasowanie, tworzymy finalny obiekt\n  if (matchingStock) {\n    finalResults.push({\n      json: {\n        \"Date\": formattedDate,\n        \"Symbol\": aiSymbol,\n        \"Shares price\": matchingStock.json[\"Current_Price\"],\n        \"Level of importance [0-10]\": aiItem.json.importance,\n        \"Trend 1D [%]\": matchingStock.json[\"Trend_1D [%]\"],\n        \"Trend 7D [%]\": matchingStock.json[\"Trend_7D [%]\"],\n        \"Trend 30D [%]\": matchingStock.json[\"Trend_30D [%]\"],\n        \"Trend 1Y [%]\": matchingStock.json[\"Trend_1Y [%]\"],\n        \"LLM description\": aiItem.json.description\n      }\n    });\n  }\n}\n\nreturn finalResults;"
+        "jsCode": "// Get the full list of AI responses from the previous node\nconst aiResults = $input.all();\n\n// Get the full list of stock data (make sure the node name is correct!)\nconst stockDataList = $('Count data').all();\n\nconst now = new Date();\nconst formattedDate = now.toISOString().replace('T', ' ').substring(0, 16);\n\nlet finalResults = [];\n\n// Iterate through each AI result\nfor (const aiItem of aiResults) {\n  const aiSymbol = aiItem.json.Symbol;\n  \n  // SEARCH: Find the object in stock data with the matching symbol\n  const matchingStock = stockDataList.find(stock => stock.json.Symbol === aiSymbol);\n\n  // If a match is found, create the final object\n  if (matchingStock) {\n    finalResults.push({\n      json: {\n        \"Date\": formattedDate,\n        \"Symbol\": aiSymbol,\n        \"Shares price\": matchingStock.json[\"Current_Price\"],\n        \"Level of importance [0-10]\": aiItem.json.importance,\n        \"Trend 1D [%]\": matchingStock.json[\"Trend_1D [%]\"],\n        \"Trend 7D [%]\": matchingStock.json[\"Trend_7D [%]\"],\n        \"Trend 30D [%]\": matchingStock.json[\"Trend_30D [%]\"],\n        \"Trend 1Y [%]\": matchingStock.json[\"Trend_1Y [%]\"],\n        \"LLM description\": aiItem.json.description\n      }\n    });\n  }\n}\n\nreturn finalResults;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -266,7 +266,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/<your file>",
+          "value": "={{ $env.SHARES_GOOGLE_SHEET_LINK }}",
           "mode": "url"
         },
         "sheetName": {
@@ -274,7 +274,7 @@
           "value": 753895271,
           "mode": "list",
           "cachedResultName": "history_workflow_data",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/<your file>"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fy23XjxEfO7FlFX-hOE8gJJ9OHC3ZbZY2nVqYFh0TLU/edit#gid=753895271"
         },
         "columns": {
           "mappingMode": "autoMapInputData",
@@ -457,8 +457,8 @@
     },
     {
       "parameters": {
-        "fromEmail": "N8N Agent <your email>",
-        "toEmail": "your email",
+        "fromEmail": "={{ $env.SHARES_ALERT_EMAIL_FROM }}",
+        "toEmail": "={{ $env.SHARES_ALERT_EMAIL_TO }}",
         "subject": "=PILNE: Gwałtowny ruch na {{ $json.Symbol }} (Ważność: {{ $json[\"Level of importance [0-10]\"] }})",
         "html": "=<h3>Wykryto istotną zmianę dla spółki {{ $json.Symbol }}</h3> <p><b>Aktualna cena:</b> {{ $json[\"Shares price\"] }}</p> <p><b>Zmiana 1D:</b> {{ $json[\"Trend 1D [%]\"] }}%</p> <p><b>Analiza AI:</b> {{ $json[\"LLM description\"] }}</p>",
         "options": {}
@@ -481,8 +481,8 @@
     },
     {
       "parameters": {
-        "fromEmail": "N8N Agent <your email>",
-        "toEmail": "your email",
+        "fromEmail": "={{ $env.SHARES_ALERT_EMAIL_FROM }}",
+        "toEmail": "={{ $env.SHARES_ALERT_EMAIL_TO }}",
         "subject": "=📊 Raport zbiorczy z analizy rynku - {{ $now.format('yyyy-MM-dd') }}",
         "html": "={{ $json.html_report }}",
         "options": {}
@@ -668,7 +668,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "5c8a4772-aa1b-4888-b9a2-1f918999cb7d",
+  "versionId": "0d3f0dd1-65c5-41ad-a4c6-ee562c593082",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
@@ -676,22 +676,22 @@
   "id": "RztLg1vJyg0fCZsR",
   "tags": [
     {
-      "name": "Shares",
-      "id": "iYf88aLPlKsbWotv",
-      "updatedAt": "2026-03-10T13:28:11.950Z",
-      "createdAt": "2026-03-10T13:28:11.950Z"
-    },
-    {
-      "name": "AI",
-      "id": "Q1I4mcXffkxC0as2",
-      "updatedAt": "2026-03-10T13:28:14.729Z",
-      "createdAt": "2026-03-10T13:28:14.729Z"
-    },
-    {
-      "name": "mail",
-      "id": "Klwdshp6NtGybcZK",
       "updatedAt": "2026-03-10T13:28:28.779Z",
-      "createdAt": "2026-03-10T13:28:28.779Z"
+      "createdAt": "2026-03-10T13:28:28.779Z",
+      "id": "Klwdshp6NtGybcZK",
+      "name": "mail"
+    },
+    {
+      "updatedAt": "2026-03-10T13:28:14.729Z",
+      "createdAt": "2026-03-10T13:28:14.729Z",
+      "id": "Q1I4mcXffkxC0as2",
+      "name": "AI"
+    },
+    {
+      "updatedAt": "2026-03-10T13:28:11.950Z",
+      "createdAt": "2026-03-10T13:28:11.950Z",
+      "id": "iYf88aLPlKsbWotv",
+      "name": "Shares"
     }
   ]
 }
