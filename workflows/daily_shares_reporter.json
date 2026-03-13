@@ -457,7 +457,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "={{ $env.SHARES_ALERT_EMAIL_FROM }}",
+        "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM }}",
         "toEmail": "={{ $env.SHARES_ALERT_EMAIL_TO }}",
         "subject": "=PILNE: Gwałtowny ruch na {{ $json.Symbol }} (Ważność: {{ $json[\"Level of importance [0-10]\"] }})",
         "html": "=<h3>Wykryto istotną zmianę dla spółki {{ $json.Symbol }}</h3> <p><b>Aktualna cena:</b> {{ $json[\"Shares price\"] }}</p> <p><b>Zmiana 1D:</b> {{ $json[\"Trend 1D [%]\"] }}%</p> <p><b>Analiza AI:</b> {{ $json[\"LLM description\"] }}</p>",
@@ -481,7 +481,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "={{ $env.SHARES_ALERT_EMAIL_FROM }}",
+        "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM }}",
         "toEmail": "={{ $env.SHARES_ALERT_EMAIL_TO }}",
         "subject": "=📊 Raport zbiorczy z analizy rynku - {{ $now.format('yyyy-MM-dd') }}",
         "html": "={{ $json.html_report }}",
