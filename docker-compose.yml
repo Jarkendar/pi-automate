@@ -17,11 +17,8 @@ services:
       - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
     volumes:
-      # n8n database and conenv_file:figuration (ignored by Git)
       - ./n8n_data:/home/node/.n8n
-      # Location for your exported workflows (versioned in Git)
       - ./workflows:/home/node/workflows
-      # Location for potential scripts (e.g., Bash/Python)
       - ./scripts:/home/node/scripts
     networks:
       - n8n-network
@@ -38,6 +35,20 @@ services:
       - n8n-network
     depends_on:
       - n8n
+
+  speaches:
+    image: ghcr.io/speaches-ai/speaches:0.9.0-rc.3-cpu
+    container_name: whisper_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - WHISPER__MODEL=small 
+      - HOST=0.0.0.0
+    volumes:
+      - ./whisper_models:/root/.cache/huggingface
+    networks:
+      - n8n-network
 
 networks:
   n8n-network:
