@@ -36,7 +36,7 @@ services:
     container_name: whisper_api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8888:8000"
     environment:
       - PRELOAD_MODELS=["Systran/faster-whisper-small"]
       - WHISPER__COMPUTE_TYPE=int8
