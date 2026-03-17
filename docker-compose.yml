@@ -8,12 +8,7 @@ services:
     env_file:
       - .env
     environment:
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - NODE_ENV=production
       - N8N_RUNNERS_MODE=external
-      - N8N_RUNNERS_ENABLED=true
       - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
     volumes:
@@ -43,12 +38,23 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - WHISPER__MODEL=small 
+      - PRELOAD_MODELS=["Systran/faster-whisper-small"]
+      - WHISPER__COMPUTE_TYPE=int8
       - HOST=0.0.0.0
     volumes:
       - ./whisper_models:/root/.cache/huggingface
     networks:
       - n8n-network
+
+  ngrok:
+      image: ngrok/ngrok:latest
+      container_name: ngrok_tunnel
+      restart: unless-stopped
+      env_file:
+        - .env
+      command: http --domain=${NGROK_DOMAIN} n8n_pi_automate:5678
+      networks:
+        - n8n-network
 
 networks:
   n8n-network:
