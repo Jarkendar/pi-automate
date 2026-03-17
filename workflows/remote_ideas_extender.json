@@ -213,7 +213,7 @@
         "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM }}",
         "toEmail": "={{ $env.TELEGRAM_IDEAS_EMAIL_TO }}",
         "subject": "=🚀 Action Plan: {{ $json.goal }}",
-        "html": "=<div style=\"font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;\">\n  \n  <h2 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">\n    🎯 Cel: {{ $json.goal }}\n  </h2>\n\n  <h3 style=\"color: #2980b9; margin-top: 20px;\">🛠 Action Plan:</h3>\n  <ul style=\"line-height: 1.6; font-size: 16px;\">\n    {{ $json.action_plan.map(item => '<li style=\"margin-bottom: 8px;\">' + item + '</li>').join('') }}\n  </ul>\n\n  <div style=\"background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 25px;\">\n    <p style=\"margin: 0; font-size: 16px;\">\n      ⏳ <strong>Szacowany łączny czas:</strong> <span style=\"color: #d35400; font-weight: bold;\">{{ $json.total_estimated_time }}</span>\n    </p>\n  </div>\n\n  <div style=\"margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc;\">\n    <p style=\"margin: 0; font-size: 14px; color: #7f8c8d;\">\n      👨‍💻 <strong>Komentarz Inżyniera:</strong><br>\n      <em>{{ $json.engineer_comment }}</em>\n    </p>\n  </div>\n\n</div>",
+        "html": "=<div style=\"font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;\">\n  \n  <h2 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">\n    🎯 Cel: {{ $json.output.goal }}\n  </h2>\n\n  <h3 style=\"color: #2980b9; margin-top: 20px;\">🛠 Action Plan:</h3>\n  <ul style=\"line-height: 1.6; font-size: 16px;\">\n    {{ $json.output.action_plan.map(item => '<li style=\"margin-bottom: 8px;\">' + item + '</li>').join('') }}\n  </ul>\n\n  <div style=\"background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 25px;\">\n    <p style=\"margin: 0; font-size: 16px;\">\n      ⏳ <strong>Szacowany łączny czas:</strong> <span style=\"color: #d35400; font-weight: bold;\">{{ $json.output.total_estimated_time }}</span>\n    </p>\n  </div>\n\n  <div style=\"margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc;\">\n    <p style=\"margin: 0; font-size: 14px; color: #7f8c8d;\">\n      👨‍💻 <strong>Komentarz Inżyniera:</strong><br>\n      <em>{{ $json.output.engineer_comment }}</em>\n    </p>\n  </div>\n\n</div>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
@@ -365,7 +365,7 @@
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "=✅ <b>PROJEKT ZAAKCEPTOWANY</b>  Zbudowałem Action Plan dla Twojego zgłoszenia: 🎯 <i>{{ $('AI Agent').item.json.goal }}</i>  📧 Pełny, rozbity na kroki plan z estymacjami czasowymi czeka już w Twojej skrzynce mailowej.  👨‍💻 <b>Komentarz Inżyniera:</b> <i>{{ $('AI Agent').item.json.engineer_comment }}</i>",
+        "text": "=✅ <b>PROJEKT ZAAKCEPTOWANY</b>  Zbudowałem Action Plan dla Twojego zgłoszenia: 🎯 <i>{{ $json.output.goal }}</i>\n📧 Pełny, rozbity na kroki plan z estymacjami czasowymi czeka już w Twojej skrzynce mailowej.\n\n💻 <b>Komentarz Inżyniera:</b> <i>{{ $json.output.engineer_comment }}</i>",
         "additionalFields": {
           "parse_mode": "HTML"
         }
