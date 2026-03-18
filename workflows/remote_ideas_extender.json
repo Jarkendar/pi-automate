@@ -37,7 +37,7 @@
             {
               "id": "f895225f-0532-4d3e-8fcc-7ebae72339c6",
               "leftValue": "={{ $json.message.from.id }}",
-              "rightValue": "={{ $env.TELEGRAM_ID_IDEAD_CHAT}}",
+              "rightValue": "={{ $env.TELEGRAM_ID_IDEAS_CHAT}}",
               "operator": {
                 "type": "number",
                 "operation": "equals"
