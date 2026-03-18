@@ -4,15 +4,16 @@
     {
       "parameters": {
         "updates": [
-          "message"
+          "message",
+          "callback_query"
         ],
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -2192,
-        304
+        -2720,
+        672
       ],
       "id": "a895ec59-e195-4100-83cc-1c60fa78a24d",
       "name": "Telegram Trigger",
@@ -195,7 +196,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        0,
+        16,
         448
       ],
       "id": "70b55df9-d0c6-4edb-ad08-e9d8fd60f598",
@@ -453,8 +454,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -2240,
-        704
+        -2448,
+        1504
       ],
       "typeVersion": 1,
       "id": "2d3fbecd-5879-4863-871d-0a98f45635e2",
@@ -477,8 +478,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -2192,
-        752
+        -2400,
+        1552
       ],
       "id": "f5b44ff6-f1c7-424b-824e-0ddaaff9f6f0",
       "name": "Week trigger"
@@ -490,8 +491,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1776,
-        752
+        -1984,
+        1552
       ],
       "id": "a1bbc1c4-c26b-412c-8a95-c97d8b63d0b3",
       "name": "Prepare html"
@@ -523,8 +524,8 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -1984,
-        752
+        -2192,
+        1552
       ],
       "id": "d77e3beb-22af-4ceb-84ee-b147695631c0",
       "name": "Get all from last week",
@@ -546,8 +547,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        -1536,
-        752
+        -1744,
+        1552
       ],
       "id": "5c4aa23f-00f6-4e6f-9edd-869497050577",
       "name": "Send weekly mail",
@@ -566,8 +567,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -752,
-        752
+        -1600,
+        720
       ],
       "id": "e5726c06-282f-4a4c-81a5-9fb16a341ea0",
       "name": "Choose random"
@@ -604,8 +605,8 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -960,
-        752
+        -1808,
+        720
       ],
       "id": "8e07de11-7106-40e4-aaeb-cfad99bce845",
       "name": "Get all ToDo and InProgress",
@@ -629,8 +630,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -1168,
-        752
+        -2016,
+        720
       ],
       "id": "5af660e8-4ac8-4b9c-ad45-babb9d91e802",
       "name": "Every day"
@@ -742,8 +743,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -752,
-        944
+        -1872,
+        960
       ],
       "id": "cdba6c3c-52a5-4276-8700-0fb4256949f0",
       "name": "Switch by action"
@@ -755,34 +756,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -960,
-        976
+        -2080,
+        992
       ],
       "id": "872a13d0-63e6-4f28-95e3-d38398b4f0ff",
       "name": "Get callback action"
-    },
-    {
-      "parameters": {
-        "updates": [
-          "callback_query"
-        ],
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegramTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        -1168,
-        976
-      ],
-      "id": "f40b21dc-d82f-47f6-845f-a8b76efcfe08",
-      "name": "Choose option",
-      "webhookId": "a74544d8-7786-4902-bca1-1a891b19240f",
-      "credentials": {
-        "telegramApi": {
-          "id": "ZOlOngFYrZFu52vU",
-          "name": "Telegram account"
-        }
-      }
     },
     {
       "parameters": {
@@ -806,8 +784,8 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -480,
-        928
+        -1600,
+        944
       ],
       "id": "5c2193b7-d179-4cf9-8c71-4f5edb5d9d7b",
       "name": "Reject idea",
@@ -840,8 +818,8 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -480,
-        1248
+        -1600,
+        1264
       ],
       "id": "fad259f2-ebc8-4d12-b9c4-d4119091809f",
       "name": "Set Done",
@@ -874,8 +852,8 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -480,
-        1088
+        -1600,
+        1104
       ],
       "id": "28ceae65-e845-4825-80ef-00fbc3df3bec",
       "name": "Set InProgress",
@@ -889,13 +867,13 @@
     {
       "parameters": {
         "content": "Status checker\n",
-        "height": 720,
-        "width": 1248
+        "height": 752,
+        "width": 1056
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1232,
-        704
+        -2144,
+        688
       ],
       "typeVersion": 1,
       "id": "51714365-2697-4b65-b1b9-d46ee580fbef",
@@ -945,8 +923,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -544,
-        752
+        -1392,
+        720
       ],
       "id": "106b71f5-8ab7-47b5-8b8a-906305f3a71b",
       "name": "Send modify status message",
@@ -969,8 +947,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -176,
-        928
+        -1296,
+        944
       ],
       "id": "b7b8a5d8-9326-4d23-a824-6ce8106c8664",
       "name": "Send confirm",
@@ -981,6 +959,72 @@
           "name": "Telegram account"
         }
       }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message ? \"new_message\" : \"button_click\" }}",
+                    "rightValue": "new_message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d209084-291c-4b62-b273-d3f81c862036"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f857e2a3-948e-418b-aa22-6bc0dc5683d2",
+                    "leftValue": "={{ $json.message ? \"new_message\" : \"button_click\" }}",
+                    "rightValue": "button_click",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isButtonClick"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        672
+      ],
+      "id": "ff6eb17a-d175-42b4-939a-c82020638465",
+      "name": "Switch"
     }
   ],
   "pinData": {},
@@ -989,7 +1033,7 @@
       "main": [
         [
           {
-            "node": "Is message from good bot",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -1238,17 +1282,6 @@
         ]
       ]
     },
-    "Choose option": {
-      "main": [
-        [
-          {
-            "node": "Get callback action",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Reject idea": {
       "main": [
         [
@@ -1281,6 +1314,24 @@
           }
         ]
       ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Is message from good bot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get callback action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -1289,7 +1340,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "44438207-4463-48b3-8475-c9c7e5455789",
+  "versionId": "259fdfa4-3a88-4a9e-8e37-4492d18a249a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
