@@ -11,15 +11,15 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        0,
-        0
+        -2192,
+        304
       ],
-      "id": "af806251-75fa-44b5-a93c-3c02275301eb",
+      "id": "a895ec59-e195-4100-83cc-1c60fa78a24d",
       "name": "Telegram Trigger",
       "webhookId": "eb16360f-76bb-49e6-8b46-e2e516f5f913",
       "credentials": {
         "telegramApi": {
-          "id": "yvzodv0lptCh0oGC",
+          "id": "ZOlOngFYrZFu52vU",
           "name": "Telegram account"
         }
       }
@@ -37,7 +37,7 @@
             {
               "id": "f895225f-0532-4d3e-8fcc-7ebae72339c6",
               "leftValue": "={{ $json.message.from.id }}",
-              "rightValue": "={{ $env.TELEGRAM_ID_IDEAS_CHAT}}",
+              "rightValue": "={{ parseInt($env.TELEGRAM_ID_IDEAS_CHAT, 10) }}",
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -53,10 +53,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        208,
-        0
+        -1984,
+        304
       ],
-      "id": "1c720bf7-aaf2-4354-93e1-c0271c803029",
+      "id": "c1b22c53-5a98-440e-aad2-3dc292127e40",
       "name": "Is message from good bot"
     },
     {
@@ -68,15 +68,15 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        720,
-        160
+        -1472,
+        464
       ],
-      "id": "4aa2aea2-bffd-4697-8228-11d7d4222491",
+      "id": "02d63eb3-e20d-49a1-b14c-a5ea58ba34bf",
       "name": "Download voice file",
       "webhookId": "d4ed85b0-0141-4f6a-a718-db4561e2a4c2",
       "credentials": {
         "telegramApi": {
-          "id": "yvzodv0lptCh0oGC",
+          "id": "ZOlOngFYrZFu52vU",
           "name": "Telegram account"
         }
       }
@@ -98,10 +98,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1184,
-        -32
+        -1008,
+        272
       ],
-      "id": "d4e7aaa2-e8a7-44eb-a4db-11e71a0415f7",
+      "id": "25fcce1c-2be8-4be3-a4d8-8e1488d7c3e8",
       "name": "Get only text"
     },
     {
@@ -121,10 +121,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1184,
-        160
+        -1008,
+        464
       ],
-      "id": "0e9b482d-e005-4daf-b773-161de91daff3",
+      "id": "126bc3e3-4f36-4282-bd13-9196ae40f692",
       "name": "Get parsed text"
     },
     {
@@ -139,10 +139,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1568,
-        -32
+        -624,
+        272
       ],
-      "id": "f2c265d4-fe06-4e0c-959a-bf050947288c",
+      "id": "4cb62c6c-2152-485c-9170-411bc9eb6801",
       "name": "AI Agent"
     },
     {
@@ -158,14 +158,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        1568,
-        176
+        -624,
+        480
       ],
-      "id": "3132b37d-1f4d-413f-a252-6258b9bee66c",
+      "id": "07f61469-15e8-4863-8185-eaf005f9033d",
       "name": "Anthropic Chat Model",
       "credentials": {
         "anthropicApi": {
-          "id": "i2N3rPShmZjeQ3Wb",
+          "id": "qHSgWhy7lmBnmFr3",
           "name": "Anthropic account"
         }
       }
@@ -178,10 +178,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1712,
-        176
+        -480,
+        480
       ],
-      "id": "af596492-7cbd-49ce-a299-2d1409df8935",
+      "id": "0e11b5c4-3a51-4a71-9e4b-66aeaab4330f",
       "name": "Structured Output Parser"
     },
     {
@@ -195,15 +195,15 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2192,
-        144
+        0,
+        448
       ],
-      "id": "120f7cd2-64b8-4e9a-94c6-d7b40b9f5ed7",
+      "id": "70b55df9-d0c6-4edb-ad08-e9d8fd60f598",
       "name": "Send rejected reason",
       "webhookId": "d03bcf80-1831-4047-9021-b0d541139baa",
       "credentials": {
         "telegramApi": {
-          "id": "yvzodv0lptCh0oGC",
+          "id": "ZOlOngFYrZFu52vU",
           "name": "Telegram account"
         }
       }
@@ -212,23 +212,23 @@
       "parameters": {
         "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM }}",
         "toEmail": "={{ $env.TELEGRAM_IDEAS_EMAIL_TO }}",
-        "subject": "=🚀 Action Plan: {{ $json.goal }}",
+        "subject": "=🚀 Action Plan: {{ $json.output.goal }}",
         "html": "=<div style=\"font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;\">\n  \n  <h2 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">\n    🎯 Cel: {{ $json.output.goal }}\n  </h2>\n\n  <h3 style=\"color: #2980b9; margin-top: 20px;\">🛠 Action Plan:</h3>\n  <ul style=\"line-height: 1.6; font-size: 16px;\">\n    {{ $json.output.action_plan.map(item => '<li style=\"margin-bottom: 8px;\">' + item + '</li>').join('') }}\n  </ul>\n\n  <div style=\"background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 25px;\">\n    <p style=\"margin: 0; font-size: 16px;\">\n      ⏳ <strong>Szacowany łączny czas:</strong> <span style=\"color: #d35400; font-weight: bold;\">{{ $json.output.total_estimated_time }}</span>\n    </p>\n  </div>\n\n  <div style=\"margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc;\">\n    <p style=\"margin: 0; font-size: 14px; color: #7f8c8d;\">\n      👨‍💻 <strong>Komentarz Inżyniera:</strong><br>\n      <em>{{ $json.output.engineer_comment }}</em>\n    </p>\n  </div>\n\n</div>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        2192,
-        -304
+        16,
+        -96
       ],
-      "id": "a3c6d3d9-ff14-4780-a8e3-7e2c5604ff40",
+      "id": "8267bbbf-ce42-4bfc-9cd1-e5435de5237a",
       "name": "Send idea",
       "webhookId": "1dcef23f-fc45-4081-a94b-0b015ab5e52d",
       "credentials": {
         "smtp": {
-          "id": "e2B7B8MpOj8P6lyN",
-          "name": "N8N bot Gmail"
+          "id": "24yqgL5wqdQHCmey",
+          "name": "SMTP account"
         }
       }
     },
@@ -259,10 +259,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1920,
-        -32
+        -272,
+        272
       ],
-      "id": "71781e72-02b3-43d0-ba3f-7c19a8c441fa",
+      "id": "4b4423bf-d3fc-49c5-94bd-ccde5e687986",
       "name": "is plan"
     },
     {
@@ -326,10 +326,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        480,
-        -16
+        -1712,
+        288
       ],
-      "id": "5052d0d1-a9fb-4d16-8a7c-97eb1102da50",
+      "id": "579ce03a-8783-44bb-bd8f-b3fc29b171d6",
       "name": "Input format switch"
     },
     {
@@ -356,16 +356,16 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        944,
-        160
+        -1248,
+        464
       ],
-      "id": "b5353264-cac5-4f60-93ae-812d974c63b9",
+      "id": "14936011-0fa0-41d9-b3c0-275b609b6b6c",
       "name": "Parse audio file"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "=✅ <b>PROJEKT ZAAKCEPTOWANY</b>  Zbudowałem Action Plan dla Twojego zgłoszenia: 🎯 <i>{{ $json.output.goal }}</i>\n📧 Pełny, rozbity na kroki plan z estymacjami czasowymi czeka już w Twojej skrzynce mailowej.\n\n💻 <b>Komentarz Inżyniera:</b> <i>{{ $json.output.engineer_comment }}</i>",
+        "text": "=✅ <b>PROJEKT ZAAKCEPTOWANY</b>  Zbudowałem Action Plan dla Twojego zgłoszenia: 🎯 <i>{{ $json.output.goal }}</i>  \n📧 Pełny, rozbity na kroki plan z estymacjami czasowymi czeka już w Twojej skrzynce mailowej.  \n\n👨‍💻 <b>Komentarz Inżyniera:</b> <i>{{ $json.output.engineer_comment }}</i>",
         "additionalFields": {
           "parse_mode": "HTML"
         }
@@ -373,15 +373,611 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2192,
-        -160
+        16,
+        48
       ],
-      "id": "2c2cb049-1520-4143-a1e6-ad12a987364f",
+      "id": "3710e462-555e-4c06-b3e2-7e4984ff883d",
       "name": "Send a text message",
       "webhookId": "d826f49f-2a54-44cb-9546-2e9bb499919b",
       "credentials": {
         "telegramApi": {
-          "id": "yvzodv0lptCh0oGC",
+          "id": "ZOlOngFYrZFu52vU",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "327a4a75-7d61-80f7-9f60-e2e49dadc0e0",
+          "mode": "list",
+          "cachedResultName": "Ideas store",
+          "cachedResultUrl": "https://www.notion.so/327a4a757d6180f79f60e2e49dadc0e0"
+        },
+        "title": "={{ $json.output.goal }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Description|rich_text",
+              "textContent": "={{ $json.output.engineer_comment }}"
+            },
+            {
+              "key": "Action plane|rich_text",
+              "textContent": "={{ $json.output.action_plan.join('\\n- ') }}"
+            },
+            {
+              "key": "Estimate time|rich_text",
+              "textContent": "={{ $json.output.total_estimated_time }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        192
+      ],
+      "id": "f8cae0ca-2a4e-4ffb-a692-8da11ef3bd2f",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Flow to validate and extended idea",
+        "height": 768,
+        "width": 2464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2240,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "2bc6e0ce-b3a9-42e9-b6a9-f36be859d176",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Week notifier\n",
+        "height": 224,
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2240,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "2d3fbecd-5879-4863-871d-0a98f45635e2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2192,
+        752
+      ],
+      "id": "f5b44ff6-f1c7-424b-824e-0ddaaff9f6f0",
+      "name": "Week trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "let html = \"<h2>Twoje podsumowanie pomysłów z ostatnich 7 dni:</h2><ul>\";\n\n// Przechodzimy przez każdy pomysł pobrany z Notion\nfor (const item of $input.all()) {\n  // Zaktualizowane nazwy zmiennych (z przedrostkiem property_)\n  const title = item.json.property_title || item.json.name || \"Brak tytułu\"; \n  const status = item.json.property_status || \"Nieznany\";\n  const url = item.json.url || \"#\";\n  const time = item.json.property_estimate_time || \"?\";\n\n  // Dodajemy punkt do listy HTML\n  html += `<li><strong><a href=\"${url}\">${title}</a></strong> - Status: <em>${status}</em> (Czas: ${time})</li>`;\n}\n\nhtml += \"</ul><p>Owocnego realizowania zadań!</p>\";\n\n// Zwracamy jeden element z gotowym kodem HTML maila\nreturn [{ json: { emailContent: html } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1776,
+        752
+      ],
+      "id": "a1bbc1c4-c26b-412c-8a95-c97d8b63d0b3",
+      "name": "Prepare html"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "327a4a75-7d61-80f7-9f60-e2e49dadc0e0",
+          "mode": "list",
+          "cachedResultName": "Ideas store",
+          "cachedResultUrl": "https://www.notion.so/327a4a757d6180f79f60e2e49dadc0e0"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Modify time|last_edited_time",
+              "condition": "after",
+              "lastEditedTime": "={{ $today.minus(7, 'days') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1984,
+        752
+      ],
+      "id": "d77e3beb-22af-4ceb-84ee-b147695631c0",
+      "name": "Get all from last week",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM}}",
+        "toEmail": "={{ $env.TELEGRAM_IDEAS_EMAIL_TO}}",
+        "subject": "Tygodniowy przegląd pomysłów 💡",
+        "html": "={{ $json.emailContent }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -1536,
+        752
+      ],
+      "id": "5c4aa23f-00f6-4e6f-9edd-869497050577",
+      "name": "Send weekly mail",
+      "webhookId": "ac8145ee-5531-44c9-b3b2-2fd4349f8489",
+      "credentials": {
+        "smtp": {
+          "id": "24yqgL5wqdQHCmey",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n// Jeśli nie ma żadnych pomysłów do przeglądu, zatrzymaj workflow\nif (items.length === 0) return []; \n\n// Losowanie jednego elementu\nconst randomItem = items[Math.floor(Math.random() * items.length)];\n\nreturn [randomItem];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        752
+      ],
+      "id": "e5726c06-282f-4a4c-81a5-9fb16a341ea0",
+      "name": "Choose random"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "327a4a75-7d61-80f7-9f60-e2e49dadc0e0",
+          "mode": "list",
+          "cachedResultName": "Ideas store",
+          "cachedResultUrl": "https://www.notion.so/327a4a757d6180f79f60e2e49dadc0e0"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "Not started"
+            },
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "In progress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -960,
+        752
+      ],
+      "id": "8e07de11-7106-40e4-aaeb-cfad99bce845",
+      "name": "Get all ToDo and InProgress",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1168,
+        752
+      ],
+      "id": "5af660e8-4ac8-4b9c-ad45-babb9d91e802",
+      "name": "Every day"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "rej",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b00e946c-146f-44de-b68c-c59cfb4c65e8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejected"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0809813c-ba6d-4c15-86e0-45b51c2d0c10",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "lat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Late"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "52325901-8e15-4dbc-ab7b-48e25693236d",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "prg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "InProgress"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "118a046a-bcd3-4d24-9167-89458db31e43",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "don",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -752,
+        944
+      ],
+      "id": "cdba6c3c-52a5-4276-8700-0fb4256949f0",
+      "name": "Switch by action"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobieramy dane ukryte w przycisku (np. \"rej_12345678\")\nconst callbackData = $input.first().json.callback_query.data;\nconst message = $input.first().json.callback_query.message;\n\n// Rozdzielamy na akcję i ID strony w Notion\nconst action = callbackData.split('_')[0]; // \"rej\", \"lat\" lub \"prg\"\nconst pageId = callbackData.split('_')[1]; // ID strony w Notion\n\nreturn [{\n  json: {\n    action: action,\n    pageId: pageId,\n    chatId: message.chat.id,\n    messageId: message.message_id,\n    originalText: message.text\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        976
+      ],
+      "id": "872a13d0-63e6-4f28-95e3-d38398b4f0ff",
+      "name": "Get callback action"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1168,
+        976
+      ],
+      "id": "f40b21dc-d82f-47f6-845f-a8b76efcfe08",
+      "name": "Choose option",
+      "webhookId": "a74544d8-7786-4902-bca1-1a891b19240f",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZOlOngFYrZFu52vU",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.pageId }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        928
+      ],
+      "id": "5c2193b7-d179-4cf9-8c71-4f5edb5d9d7b",
+      "name": "Reject idea",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.pageId }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        1248
+      ],
+      "id": "fad259f2-ebc8-4d12-b9c4-d4119091809f",
+      "name": "Set Done",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.pageId }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "In progress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        1088
+      ],
+      "id": "28ceae65-e845-4825-80ef-00fbc3df3bec",
+      "name": "Set InProgress",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Status checker\n",
+        "height": 720,
+        "width": 1248
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1232,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "51714365-2697-4b65-b1b9-d46ee580fbef",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_ID_IDEAS_CHAT }}",
+        "text": "=Hej! Co powiesz na ten pomysł: {{ $json.property_title }}?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Odrzucam ❌",
+                    "additionalFields": {
+                      "callback_data": "=rej_{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Na później ⏳",
+                    "additionalFields": {
+                      "callback_data": "=lat_{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Właśnie robię 🚀",
+                    "additionalFields": {
+                      "callback_data": "=prg_{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Zrobione ✅",
+                    "additionalFields": {
+                      "callback_data": "=don_{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        752
+      ],
+      "id": "106b71f5-8ab7-47b5-8b8a-906305f3a71b",
+      "name": "Send modify status message",
+      "webhookId": "59781594-8b2d-4ec8-8ee2-d135e82796ea",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZOlOngFYrZFu52vU",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Get callback action').item.json.chatId }}",
+        "messageId": "={{ $('Get callback action').item.json.messageId }}",
+        "text": "✅ Status pomysłu zaktualizowany! (Przyciski usunięte)",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        928
+      ],
+      "id": "b7b8a5d8-9326-4d23-a824-6ce8106c8664",
+      "name": "Send confirm",
+      "webhookId": "e26bb31a-48cb-4172-ba8f-b9c79904204c",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZOlOngFYrZFu52vU",
           "name": "Telegram account"
         }
       }
@@ -489,6 +1085,11 @@
             "node": "Send a text message",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
           }
         ],
         [
@@ -528,6 +1129,158 @@
           }
         ]
       ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Week trigger": {
+      "main": [
+        [
+          {
+            "node": "Get all from last week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare html": {
+      "main": [
+        [
+          {
+            "node": "Send weekly mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all from last week": {
+      "main": [
+        [
+          {
+            "node": "Prepare html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all ToDo and InProgress": {
+      "main": [
+        [
+          {
+            "node": "Choose random",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every day": {
+      "main": [
+        [
+          {
+            "node": "Get all ToDo and InProgress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose random": {
+      "main": [
+        [
+          {
+            "node": "Send modify status message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch by action": {
+      "main": [
+        [
+          {
+            "node": "Reject idea",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Set InProgress",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get callback action": {
+      "main": [
+        [
+          {
+            "node": "Switch by action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose option": {
+      "main": [
+        [
+          {
+            "node": "Get callback action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reject idea": {
+      "main": [
+        [
+          {
+            "node": "Send confirm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Done": {
+      "main": [
+        [
+          {
+            "node": "Send confirm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set InProgress": {
+      "main": [
+        [
+          {
+            "node": "Send confirm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -536,36 +1289,36 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "e0525407-4b02-44ec-a517-f68b473bfbee",
+  "versionId": "44438207-4463-48b3-8475-c9c7e5455789",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
   },
-  "id": "D7ZvpWnI4Ighifzx",
+  "id": "3mKei1RZ5W4kHHsJ",
   "tags": [
     {
-      "updatedAt": "2026-03-17T11:27:05.734Z",
-      "createdAt": "2026-03-17T11:27:05.734Z",
-      "id": "6TToDskJhXY1bNEZ",
-      "name": "telegram"
+      "updatedAt": "2026-03-17T11:59:51.752Z",
+      "createdAt": "2026-03-17T11:59:51.752Z",
+      "id": "FU6FA66mQdOPtp3I",
+      "name": "whisper"
     },
     {
-      "updatedAt": "2026-03-10T13:28:28.779Z",
-      "createdAt": "2026-03-10T13:28:28.779Z",
-      "id": "Klwdshp6NtGybcZK",
+      "updatedAt": "2026-03-12T07:14:31.968Z",
+      "createdAt": "2026-03-12T07:14:31.968Z",
+      "id": "LMI2wwmKQQRYls3c",
       "name": "mail"
     },
     {
-      "updatedAt": "2026-03-10T13:28:14.729Z",
-      "createdAt": "2026-03-10T13:28:14.729Z",
-      "id": "Q1I4mcXffkxC0as2",
+      "updatedAt": "2026-03-12T07:14:31.974Z",
+      "createdAt": "2026-03-12T07:14:31.974Z",
+      "id": "OqaaPle0q9sJnyCh",
       "name": "AI"
     },
     {
-      "updatedAt": "2026-03-17T11:27:08.714Z",
-      "createdAt": "2026-03-17T11:27:08.714Z",
-      "id": "WhshlsoFC12B9bz5",
-      "name": "whisper"
+      "updatedAt": "2026-03-17T11:59:48.441Z",
+      "createdAt": "2026-03-17T11:59:48.441Z",
+      "id": "bp1lAefUYhScZun2",
+      "name": "telegram"
     }
   ]
 }
