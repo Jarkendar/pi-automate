@@ -6,7 +6,6 @@
         "rule": {
           "interval": [
             {
-              "field": "weeks",
               "triggerAtHour": 7,
               "triggerAtMinute": null
             }
@@ -16,64 +15,64 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -336,
-        -48
+        0,
+        0
       ],
-      "id": "f9ab2527-135d-4260-83f8-a457d8b22dee",
+      "id": "3dfa9eac-08e1-4ff5-bc40-8a6318b31f2b",
       "name": "Schedule Trigger"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Jesteś Wizjonerem Technologicznym i Inżynierem Interdyscyplinarnym. Twoim zadaniem jest wygenerowanie 3 unikalnych pomysłów na projekty, które w pełni wykorzystują potencjał mojego warsztatu.\n\nDzisiaj jest: {{ $json.timestamp }}\n\nMÓJ WARSZTAT (Dostępne klocki):\n- Software: Python (FastAPI, scripting, AI), n8n (workflow automation), AI Agents, KMP (Kotlin Multiplatform), Android API.\n- Hardware: Raspberry Pi 5, Drukarka 3D (PLA/PETG/TPU), Android Phone, PC.\n- Technologie/Trendy: Local LLMs (Ollama), Edge AI, Vision, Multi-agent systems.\n\nZADANIE:\nZaproponuj dokładnie 3 projekty, zachowując poniższą strukturę czasową:\n1. Projekt lekki (~2-3h pracy) – skupiony na szybkim wdrożeniu i natychmiastowej użyteczności.\n2. Projekt lekki (~2-3h pracy) – inny niż pierwszy, może dotyczyć innej gałęzi warsztatu.\n3. Projekt duży (wielodniowy) – \"Flagowiec\", który wymaga głębokiego projektowania, łączenia wielu technologii (np. hardware + python + mobile + n8n) i iteracji.\n\nNie ograniczaj się typem (software/hardware). Sam zdecyduj, co dzisiaj jest najbardziej interesujące, innowacyjne lub po prostu przydatne w kontekście aktualnych trendów IT.\n\nWYTYCZNE DLA PÓL JSON:\n- title: Chwytliwa, techniczna nazwa projektu.\n- description: Szczegółowy opis koncepcji. Wymień konkretne biblioteki Pythona, komponenty n8n, sensory RPi czy materiały do druku 3D.\n- first_step: Konkretny, techniczny punkt startowy (np. komenda instalacyjna, link do dokumentacji lub nazwa modułu do CAD).\n- complexity: \"light\" lub \"deep_dive\"\n\nODPOWIEDZ WYŁĄCZNIE W FORMACIE JSON. Odpowiedź musi być pojedynczym obiektem posiadającym klucz \"projects\", w którym znajdzie się tablica 3 pomysłów.",
+        "text": "=Jesteś Wizjonerem Technologicznym i Inżynierem Oprogramowania. Twoim zadaniem jest wygenerowanie 4 unikalnych pomysłów na projekty oparte na moich umiejętnościach, rozwiązujące realne problemy i ułatwiające życie.\n\nDzisiaj jest: {{ $json.timestamp }}\n\nMÓJ WARSZTAT (Dostępne narzędzia):\n- Software: Kotlin (expert), Aider, Android SDK, Linux, Python (scripting, AI), n8n (workflow automation), AI Agents, KMP (Kotlin Multiplatform), Android API.\n- Hardware: Raspberry Pi 5, Drukarka 3D (PLA/PETG/TPU), Android Phone, PC.\n- Technologie/Trendy: Local LLMs (Ollama), Edge AI, Vision, Multi-agent systems, application based on KMP i CMP (Compose Multiplatform).\n\nWAŻNE ZASADY PROJEKTOWANIA:\n1. Skup się przede wszystkim na programowaniu i automatyzacji (software). Hardware (Raspberry Pi) oraz Druk 3D traktuj jako opcjonalny, rzadki dodatek. Unikaj ciągłego proponowania fizycznych konstrukcji z sensorami.\n2. Narzędzia z warsztatu dobieraj z umiarem. Używaj tylko tych, które mają rzeczywisty, logiczny sens dla danego problemu. Nie upychaj na siłę wszystkich technologii w jednym projekcie. Zaczynaj pomysł od idei, a następnie otocz to narzędziami. Nie zaczynaj od narzędzi. \n\nZADANIE:\nZaproponuj dokładnie 4 projekty, zachowując poniższą strukturę:\n1. Projekt lekki (do 4h pracy) – skrypt, automatyzacja lub mini-apka. Szybkie wdrożenie i natychmiastowa użyteczność.\n2. Projekt lekki (do 4h pracy) – inna kategoria niż pierwszy.\n3. Projekt duży (powyżej 1 dnia pracy) – \"Flagowiec\". Koncepcja na MVP (Minimum Viable Product) kompleksowego rozwiązania ułatwiającego codzienne życie lub pracę. Ma to być spójny i przemyślany system (np. backend + automatyzacja + interfejs), a nie przeładowany technologiami kombajn bez wyraźnego celu. Skup się na użyteczności i moich głównych umiejętnościach (Android Developer).\n4. Projekt czysto programistyczny (bez limitu) – rozwiązanie ułatwiające pracę, oszczędzające w długim okresie czas. Może to być skrypt, apka, flow w n8n lub cokolwiek innego, co sprawi, że \"w tle\" będę odczuwał pomoc. Sklasyfikuj \"complexity\" po obmyśleniu, daję tutaj wolną rękę co do wielkości (może być na 30 sekund, może być na miesiąc roboty po 8h dziennie). \n\nWYTYCZNE DLA PÓL JSON:\n- title: Chwytliwa nazwa projektu.\n- description: Szczegółowy opis idei i działania projektu. Skup się na tym, jaki problem rozwiązuje i jak w elegancki sposób łączy WYBRANE technologie z mojego warsztatu.\n- tags: Tablica (od 1 do maksymalnie 5 elementów) krótkich etykiet kategoryzujących pomysł (np. \"kuchnia\", \"zarządzanie\", \"apka\", \"produktywność\", \"finanse\").\n- complexity: \"light\" albo \"deep_dive\".\n\nODPOWIEDZ WYŁĄCZNIE W FORMACIE JSON. Odpowiedź musi być pojedynczym obiektem posiadającym klucz \"projects\", w którym znajdzie się tablica 4 pomysłów.",
         "hasOutputParser": true,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -64,
-        -48
+        272,
+        0
       ],
-      "id": "2278f038-371c-4c17-b55e-73a9641667cc",
+      "id": "6eb1ad7d-93a6-4dc8-af15-b3a50465024a",
       "name": "Idea Generator"
     },
     {
       "parameters": {
         "fromEmail": "={{ $env.N8N_AGENT_EMAIL_FROM }}",
         "toEmail": "={{ $env.TRIP_IDEAS_EMAIL_TO }}",
-        "subject": "=💡 [Tech Forge] 3 Nowe Pomysły na {{ $now.format('DD.MM') }}",
-        "html": "=<div style=\"font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; padding: 40px 20px;\">\n  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);\">\n    \n    <div style=\"background: linear-gradient(135deg, #2c3e50 0%, #000000 100%); color: #ffffff; padding: 30px; text-align: center;\">\n      <h1 style=\"margin: 0; font-size: 24px; letter-spacing: 1px;\">🚀 DAILY TECH FORGE</h1>\n      <p style=\"margin: 5px 0 0; opacity: 0.7; font-size: 14px;\">{{ $now.format('DD.MM.YYYY') }} | Workshop Ready</p>\n    </div>\n\n    <div style=\"padding: 30px;\">\n      \n      {{ $json.output.projects.map(project => `\n      <div style=\"margin-bottom: 40px; border-left: 5px solid ${project.complexity === 'deep_dive' ? '#e74c3c' : '#2ecc71'}; padding-left: 20px;\">\n        \n        <div style=\"display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; background-color: ${project.complexity === 'deep_dive' ? '#fdf1f0' : '#eafaf1'}; color: ${project.complexity === 'deep_dive' ? '#e74c3c' : '#2ecc71'}; margin-bottom: 10px;\">\n          ${project.complexity === 'deep_dive' ? '🚩 Deep Dive (Multi-day)' : '⚡ Light Project (2-3h)'}\n        </div>\n\n        <h2 style=\"margin: 0 0 10px 0; color: #2c3e50; font-size: 20px;\">${project.title}</h2>\n        <p style=\"color: #546e7a; line-height: 1.6; margin: 0 0 15px 0; font-size: 15px;\">\n          ${project.description}\n        </p>\n\n        <div style=\"background-color: #f8f9fa; border-radius: 8px; padding: 15px; border: 1px dashed #cfd8dc;\">\n          <strong style=\"color: #263238; font-size: 13px; display: block; margin-bottom: 5px;\">NEXT STEP:</strong>\n          <code style=\"color: #00796b; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold;\">\n            ${project.first_step}\n          </code>\n        </div>\n      </div>\n      `).join('') }}\n\n    </div>\n\n    <div style=\"background-color: #fcfcfc; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">\n      <p style=\"margin: 0; font-size: 12px; color: #90a4ae;\">\n        Stack: Python • n8n • RPi 5 • KMP • 3D Printing<br>\n        Keep building. Stay hungry.\n      </p>\n    </div>\n  </div>\n</div>",
+        "subject": "=💡 [Tech Forge] 4 Nowe Pomysły na {{ $now.format('dd.MM.yyyy') }}",
+        "html": "=<div style=\"font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; padding: 40px 20px;\">\n  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);\">\n    \n    <div style=\"background: linear-gradient(135deg, #2c3e50 0%, #000000 100%); color: #ffffff; padding: 30px; text-align: center;\">\n      <h1 style=\"margin: 0; font-size: 24px; letter-spacing: 1px;\">🚀 DAILY TECH FORGE</h1>\n      <p style=\"margin: 5px 0 0; opacity: 0.7; font-size: 14px;\">{{ $now.format('dd.MM.yyyy') }} | Workshop Ready</p>\n    </div>\n\n    <div style=\"padding: 30px;\">\n      \n      {{ $json.output.projects.map(project => `\n      <div style=\"margin-bottom: 40px; border-left: 5px solid ${project.complexity === 'deep_dive' ? '#e74c3c' : '#2ecc71'}; padding-left: 20px;\">\n        \n        <div style=\"display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; background-color: ${project.complexity === 'deep_dive' ? '#fdf1f0' : '#eafaf1'}; color: ${project.complexity === 'deep_dive' ? '#e74c3c' : '#2ecc71'}; margin-bottom: 10px;\">\n          ${project.complexity === 'deep_dive' ? '🚩 Deep Dive' : '⚡ Light Project'}\n        </div>\n\n        <h2 style=\"margin: 0 0 10px 0; color: #2c3e50; font-size: 20px;\">${project.title}</h2>\n        <p style=\"color: #546e7a; line-height: 1.6; margin: 0 0 15px 0; font-size: 15px;\">\n          ${project.description}\n        </p>\n\n        <div style=\"margin-top: 15px;\">\n          ${project.tags && Array.isArray(project.tags) ? project.tags.map(tag => `<span style=\"display: inline-block; background-color: #f1f5f9; color: #475569; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; margin-right: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0; text-transform: lowercase;\">#${tag}</span>`).join('') : ''}\n        </div>\n      </div>\n      `).join('') }}\n\n    </div>\n\n    <div style=\"background-color: #fcfcfc; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">\n      <p style=\"margin: 0; font-size: 12px; color: #90a4ae;\">\n        Stack: Kotlin • Android SDK • n8n • KMP/CMP • Local LLMs<br>\n        Keep building. Stay hungry.\n      </p>\n    </div>\n  </div>\n</div>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        352,
-        -48
+        688,
+        0
       ],
-      "id": "4994e115-a207-4bed-a962-971d1507df91",
+      "id": "8e8d4589-1879-4dc7-a9b2-b27756ea4272",
       "name": "Send Ideas",
       "webhookId": "52d2fe12-e9ed-4f50-a390-5f199dea634f",
       "credentials": {
         "smtp": {
-          "id": "e2B7B8MpOj8P6lyN",
-          "name": "N8N bot Gmail"
+          "id": "24yqgL5wqdQHCmey",
+          "name": "SMTP account"
         }
       }
     },
     {
       "parameters": {
         "schemaType": "manual",
-        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"projects\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"title\": { \"type\": \"string\" },\n          \"description\": { \"type\": \"string\" },\n          \"first_step\": { \"type\": \"string\" },\n          \"complexity\": { \"type\": \"string\", \"enum\": [\"light\", \"deep_dive\"] }\n        },\n        \"required\": [\"title\", \"description\", \"first_step\", \"complexity\"]\n      }\n    }\n  },\n  \"required\": [\"projects\"]\n}"
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"projects\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"title\": { \"type\": \"string\" },\n          \"description\": { \"type\": \"string\" },\n          \"tags\": { \n            \"type\": \"array\", \n            \"items\": { \"type\": \"string\" } \n          },\n          \"complexity\": { \"type\": \"string\", \"enum\": [\"light\", \"deep_dive\"] }\n        },\n        \"required\": [\"title\", \"description\", \"tags\", \"complexity\"]\n      }\n    }\n  },\n  \"required\": [\"projects\"]\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        80,
-        160
+        416,
+        208
       ],
-      "id": "9365d2aa-b040-4de1-9ba1-74e051bfc634",
+      "id": "23270312-f92f-413c-b4a4-533c7fe154a3",
       "name": "Structured Output Parser"
     },
     {
@@ -91,14 +90,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        -64,
-        160
+        272,
+        208
       ],
-      "id": "8b5b800a-efc2-4120-a6a2-440f2f0aeb0f",
+      "id": "a0d9bee8-6067-4238-8a11-eba430c804c1",
       "name": "Anthropic Chat Model",
       "credentials": {
         "anthropicApi": {
-          "id": "i2N3rPShmZjeQ3Wb",
+          "id": "qHSgWhy7lmBnmFr3",
           "name": "Anthropic account"
         }
       }
@@ -151,35 +150,35 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "49f7f11e-e0ea-4940-b432-10b6417c1b91",
+  "versionId": "08508db5-e691-4ffd-8364-90893f384529",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
   },
-  "id": "4YQAEzmuixXhdSTO",
+  "id": "LJshTHPrHoLciYIm",
   "tags": [
     {
-      "updatedAt": "2026-03-10T13:28:28.779Z",
-      "createdAt": "2026-03-10T13:28:28.779Z",
-      "id": "Klwdshp6NtGybcZK",
-      "name": "mail"
-    },
-    {
-      "updatedAt": "2026-03-13T07:11:33.324Z",
-      "createdAt": "2026-03-13T07:11:33.324Z",
-      "id": "Lf332skRzhusw67i",
+      "updatedAt": "2026-03-13T08:08:25.838Z",
+      "createdAt": "2026-03-13T08:08:25.838Z",
+      "id": "JSFP9ssqnJdV0Xlm",
       "name": "ideas"
     },
     {
-      "updatedAt": "2026-03-10T13:28:14.729Z",
-      "createdAt": "2026-03-10T13:28:14.729Z",
-      "id": "Q1I4mcXffkxC0as2",
+      "updatedAt": "2026-03-12T07:14:31.968Z",
+      "createdAt": "2026-03-12T07:14:31.968Z",
+      "id": "LMI2wwmKQQRYls3c",
+      "name": "mail"
+    },
+    {
+      "updatedAt": "2026-03-12T07:14:31.974Z",
+      "createdAt": "2026-03-12T07:14:31.974Z",
+      "id": "OqaaPle0q9sJnyCh",
       "name": "AI"
     }
   ]
