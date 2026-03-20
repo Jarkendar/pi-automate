@@ -1,0 +1,1318 @@
+{
+  "name": "Personal trainer",
+  "nodes": [
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2176,
+        -656
+      ],
+      "id": "2d9251b5-9b00-4f32-b74f-df9df783396a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        2096,
+        -416
+      ],
+      "id": "41979ada-83e2-4314-8176-45ca9200396d",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "qHSgWhy7lmBnmFr3",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2400,
+        -416
+      ],
+      "id": "313caea9-8277-49c4-b590-68e016eeffda",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1744,
+        -656
+      ],
+      "id": "592948cd-8024-4a97-bbc0-1d19cd918553",
+      "name": "Get many database pages",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an intent classification routing assistant for a fitness and workout tracking system. Your ONLY job is to analyze the user's message and assign it to one of the predefined categories. Do not answer the user's question or engage in conversation.\n\nAnalyze the user's input and choose exactly one of the following intents:\n- isTrainingQuestion: The user is asking about their upcoming workout, what they should do today, or querying their training plan.\n- isDataUpdate: The user is updating information about a recently completed or ongoing workout (e.g., changing status to done, adding a comment about how a specific exercise felt).\n- changeMetaData: The user is reporting a change in their physical state or general parameters that will affect future plans (e.g., weight loss, injury, sickness, joint pain, lack of sleep).\n- other: The message does not fit any of the above categories (e.g., casual greeting, unrelated questions).\n\nUser message to analyze:\n{{ $json.final_message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        864,
+        -240
+      ],
+      "id": "a3066df2-dc42-4670-ae21-ac109227ae71",
+      "name": "Intention Decryptor"
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "mode": "url",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        -256
+      ],
+      "id": "1c514187-2341-45ef-99d9-abec2f6236f1",
+      "name": "Create a page",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "mode": "url",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        -656
+      ],
+      "id": "a2cc1924-56e9-4749-82ed-dddabbcc1a6b",
+      "name": "Create a page1",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        896
+      ],
+      "id": "f4f186d8-2339-40f7-8a45-60e537f91247",
+      "name": "Evening reminder"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        896
+      ],
+      "id": "10a22f72-5ba0-4a32-bd57-13b57f3238cd",
+      "name": "Get many database pages1",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        896
+      ],
+      "id": "e2a18b2e-054e-456f-8686-d29fe93d6a9a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b728160-8663-459d-91ab-350dd5a742b2",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        896
+      ],
+      "id": "8858685d-a441-4d05-8be2-ea178af8f151",
+      "name": "mustRemind"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        752
+      ],
+      "id": "f4b119eb-a9c4-4f48-bb8d-2a3e5f437211",
+      "name": "Send a chat action",
+      "webhookId": "e36f2c6f-d0d7-461e-9124-3265e2d9b07a",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZOlOngFYrZFu52vU",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        416
+      ],
+      "id": "aa410224-d997-4c5b-bc29-b5958800e6da",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4137811e-7916-4fd1-b85d-28026e426414"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        416
+      ],
+      "id": "de500e01-4f75-40e1-bcef-41018c90041e",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2832,
+        -656
+      ],
+      "id": "cdf85122-8e7b-46e9-8b68-b013fc676311",
+      "name": "Send a text message1",
+      "webhookId": "772c7db1-75de-4322-b169-8556cc70bff1",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        -448
+      ],
+      "id": "4db7f085-17de-4ef2-b01e-b02f2e6d0356",
+      "name": "Get many database pages in Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        192
+      ],
+      "id": "1fe8cfd8-f35f-48b3-ad76-c001af072572",
+      "name": "Telegram Personal Trainer",
+      "webhookId": "0766da18-a800-4afb-b5c7-6cd0093f8fe7",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message ? \"new_message\" : \"button_click\" }}",
+                    "rightValue": "new_message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7da8148c-ffe9-42b5-8f43-2e86cee3ad47"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "88ff7ea3-4f20-4e3a-9c64-ab49815e2f7c",
+                    "leftValue": "={{ $json.message ? \"new_message\" : \"button_click\" }}",
+                    "rightValue": "button_click",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isButtonClick"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        192
+      ],
+      "id": "34f07513-55d5-4a9d-93cd-3e1415ef4251",
+      "name": "Choose Telegram Action"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "7fca322f-f754-4b3f-b929-8555ff6eb7a7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d30717d5-955a-4472-a56b-e670e9fc23e8",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isVoiceData"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        -224
+      ],
+      "id": "bb1e067f-2a0c-43f9-9ca8-5373e8c3bfa8",
+      "name": "Input format switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "069ee4ea-0b65-4a50-84be-742c4e1f3fad",
+      "name": "Download voice file",
+      "webhookId": "546675d9-d82a-4f66-b071-8c4b3fa1e02e",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://speaches:8000/v1/audio/transcriptions",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "Systran/faster-whisper-small"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        144,
+        -48
+      ],
+      "id": "29792e0b-c9e3-468e-9d89-f324b38b2bc7",
+      "name": "Parse audio file"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "792a0020-8b8d-415e-9950-4c4c0330a7af",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "ac773a01-2488-492b-85f5-5982b84d1b05",
+      "name": "Get parsed text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b15eca6-ae30-435c-8d11-2c9ce6c9df86",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -240
+      ],
+      "id": "3b2df6ec-44ab-4f2d-a8fe-814bc0c8c5d0",
+      "name": "Get only text"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"intent\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"isTrainingQuestion\",\n        \"isDataUpdate\",\n        \"changeMetaData\",\n        \"other\"\n      ],\n      \"description\": \"Zidentyfikowana intencja użytkownika.\"\n    }\n  },\n  \"required\": [\n    \"intent\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        -48
+      ],
+      "id": "3f20913a-c61d-4b1b-bb2e-7d0dcb6152ff",
+      "name": "Structured Intent Parser "
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Personal Trainer').item.json.message.chat.id }}",
+        "text": "\"Hej! Pogadałbym, ale moje jedyne zainteresowania to pot, ciężary i Twoje postępy. Wróćmy do planu treningowego. Masz jakieś pytania o dzisiejszy workout?\"",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        224
+      ],
+      "id": "7de2a569-2e34-4df5-87a2-38ca46157fe6",
+      "name": "Send is not my job",
+      "webhookId": "0c6dff09-dec8-4d91-a912-7a09afcb2a9d",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "isTrainingQuestion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ea027ac6-ed15-4f3c-9fa0-27a30443d106"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isTrainingQuestion"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7a8a38df-3075-4e43-b8af-20e378f5b410",
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "isDataUpdate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isDataUpdate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "66a49898-52f6-4bcc-adfa-4658e89a09bc",
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "changeMetaData",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "changeMetaData"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6d9503f6-9b38-4b39-adbd-75b26675bf51",
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        -272
+      ],
+      "id": "1c858919-abb9-4db2-9d09-5c3b188d9aa2",
+      "name": "Intention Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Personal Trainer').item.json.message.chat.id }}",
+        "text": "={{ $('Modify metadata').item.json.summary_text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2448,
+        -48
+      ],
+      "id": "cba29c75-2540-4a64-a831-4b3da2e6da8f",
+      "name": "Metadata updated",
+      "webhookId": "d94b7a49-5e25-47c1-ac48-287401da7090",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an intelligent data extraction assistant for a fitness tracking system. \nThe user is providing updates about their physical state, goals, injuries, or available equipment.\n\nYour task is to analyze the user's message and extract the relevant parameters to update their profile.\nONLY extract information explicitly mentioned in the user's message. \nIf a specific parameter (like weight, height, goal, injury, etc.) is NOT mentioned, you must leave it empty or return null/0. Do not guess or make up values.\n\nUser message to analyze:\n{{ $('Unified Text').item.json.final_message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1552,
+        -48
+      ],
+      "id": "929ce5bd-1e9c-409d-b3ec-84c53e63b1a8",
+      "name": "Interpreter Metadata"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"weight\": {\n      \"type\": \"number\",\n      \"description\": \"Waga użytkownika w kg. Zwróć 0 jeśli nie wspomniano.\"\n    },\n    \"height\": {\n      \"type\": \"number\",\n      \"description\": \"Wzrost użytkownika w cm. Zwróć 0 jeśli nie wspomniano.\"\n    },\n    \"goal\": {\n      \"type\": \"string\",\n      \"description\": \"Nowy cel treningowy. Zwróć pusty ciąg znaków '', jeśli nie wspomniano.\"\n    },\n    \"injuries_and_diseases\": {\n      \"type\": \"string\",\n      \"description\": \"Zgłaszane kontuzje, choroby, ból. Zwróć pusty ciąg znaków '', jeśli nie wspomniano.\"\n    },\n    \"interests_and_disciplines\": {\n      \"type\": \"string\",\n      \"description\": \"Zainteresowania sportowe i poziom, zmiany zainteresowań lub poziomu. Zwróć pusty ciąg znaków '', jeśli nie wspomniano.\"\n    },\n    \"equipment_and_tools\": {\n      \"type\": \"string\",\n      \"description\": \"Zgłoszone zmiany w sprzęcie (np. kupione, sprzedane, zepsute rzeczy). Zwróć 'empty', jeśli nie wspomniano.\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1696,
+        112
+      ],
+      "id": "813ad3c0-fa9b-4c03-8b26-703c562741a1",
+      "name": "Structured Metadata Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a16d206c-1519-49dd-87d0-b358db8d14e6",
+              "name": "final_message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        -240
+      ],
+      "id": "963ccfbe-3561-4b5a-9842-ae6441d83e44",
+      "name": "Unified Text"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "329a4a757d6180b8a1afef339a45eca3",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        -48
+      ],
+      "id": "ec660bf4-f492-4f8f-bdd1-1d8921fbd283",
+      "name": "Get metadata page",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. GET DATA FROM PREVIOUS NODES\n// Pobieramy dane z węzła Interpreter Metadata (korzystając z .first() dla trybu Run Once)\nconst aiData = $('Interpreter Metadata').first().json.output; \nconst notionData = $input.first().json; \n\n// 2. PREPARE TODAY'S DATE\nconst today = new Date().toISOString().split('T')[0];\n\n// 3. WEIGHT AND HEIGHT (Overwrite, unless AI returned empty/0)\n// Używamy uproszczonych nazw propertisów z panelu po lewej\nlet result = {\n  weight: (aiData.weight > 0) ? aiData.weight : (notionData.property_weight_kg || null),\n  height: (aiData.height > 0) ? aiData.height : (notionData.property_height_cm || null)\n};\n\n// 4. FUNCTION TO CREATE HISTORY (Appending)\nfunction appendHistory(notionPropName, aiValue) {\n  // Ponieważ Notion zwraca teraz zwykły tekst (string), wyciągamy go bezpośrednio\n  let oldText = notionData[notionPropName] || \"\";\n  \n  // Dodajemy enter, jeśli był stary tekst i nie kończy się enterem\n  if (oldText.length > 0 && !oldText.endsWith(\"\\n\")) {\n    oldText += \"\\n\";\n  }\n\n  // If AI found something and it's not \"empty\"\n  if (aiValue && aiValue !== \"empty\" && aiValue !== \"\") {\n    return oldText + today + \": \" + aiValue;\n  }\n  \n  // If AI found nothing, return the old text\n  return oldText.trim();\n}\n\n// 5. APPLY THE FUNCTION\nresult.injuries = appendHistory('property_injuries_and_diseases', aiData.injuries_and_diseases);\nresult.interests = appendHistory('property_interests_and_disciplines', aiData.interests_and_disciplines);\nresult.equipment = appendHistory('property_equipment_and_tools', aiData.equipment_and_tools);\nresult.goal = appendHistory('property_goal', aiData.goal);\n\n// 6. GENERATE SUMMARY FOR TELEGRAM\nlet summary = \"✅ Zaktualizowałem Twój profil!\\n\\nZanotowałem:\\n\";\n\nif (aiData.weight > 0) summary += `⚖️ Waga: ${aiData.weight} kg\\n`;\nif (aiData.height > 0) summary += `📏 Wzrost: ${aiData.height} cm\\n`;\nif (aiData.goal && aiData.goal !== \"empty\" && aiData.goal !== \"\") summary += `🎯 Cel: ${aiData.goal}\\n`;\nif (aiData.injuries_and_diseases && aiData.injuries_and_diseases !== \"empty\" && aiData.injuries_and_diseases !== \"\") summary += `🩹 Zdrowie: ${aiData.injuries_and_diseases}\\n`;\nif (aiData.interests_and_disciplines && aiData.interests_and_disciplines !== \"empty\" && aiData.interests_and_disciplines !== \"\") summary += `⚽ Zainteresowania: ${aiData.interests_and_disciplines}\\n`;\nif (aiData.equipment_and_tools && aiData.equipment_and_tools !== \"empty\" && aiData.equipment_and_tools !== \"\") summary += `🏋️ Sprzęt: ${aiData.equipment_and_tools}`;\n\n\nresult.summary_text = summary;\n// 7. OUTPUT THE FINAL DATA PACKAGE\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        -48
+      ],
+      "id": "05b03934-6a7f-4f68-b2de-39b763082e45",
+      "name": "Modify metadata"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "329a4a757d6180b8a1afef339a45eca3",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Weight [kg]|number",
+              "numberValue": "={{ $json.weight }}"
+            },
+            {
+              "key": "Height [cm]|number",
+              "numberValue": "={{ $json.height }}"
+            },
+            {
+              "key": "Goal|rich_text",
+              "textContent": "={{ $json.goal }}"
+            },
+            {
+              "key": "Injuries and Diseases|rich_text",
+              "textContent": "={{ $json.injuries }}"
+            },
+            {
+              "key": "Interests and Disciplines|rich_text",
+              "textContent": "={{ $json.interests }}"
+            },
+            {
+              "key": "Equipment and Tools|rich_text",
+              "textContent": "={{ $json.equipment }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        -48
+      ],
+      "id": "7b7df260-d968-49da-a5a7-b3ab44a05208",
+      "name": "Update a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=claude-haiku-4-5-20251001",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        160
+      ],
+      "id": "3b9ae4ca-d059-42f7-a455-db50312ec779",
+      "name": "Anthropic Haiku",
+      "credentials": {
+        "anthropicApi": {
+          "id": "qHSgWhy7lmBnmFr3",
+          "name": "Anthropic account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intention Decryptor": {
+      "main": [
+        [
+          {
+            "node": "Intention Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evening reminder": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "mustRemind",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mustRemind": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a page": {
+      "main": [
+        []
+      ]
+    },
+    "Create a page1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages in Notion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Personal Trainer": {
+      "main": [
+        [
+          {
+            "node": "Choose Telegram Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose Telegram Action": {
+      "main": [
+        [
+          {
+            "node": "Input format switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Input format switch": {
+      "main": [
+        [
+          {
+            "node": "Get only text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download voice file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download voice file": {
+      "main": [
+        [
+          {
+            "node": "Parse audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse audio file": {
+      "main": [
+        [
+          {
+            "node": "Get parsed text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get parsed text": {
+      "main": [
+        [
+          {
+            "node": "Unified Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get only text": {
+      "main": [
+        [
+          {
+            "node": "Unified Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Intent Parser ": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Intention Decryptor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intention Switch": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Interpreter Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send is not my job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Metadata Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Interpreter Metadata",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unified Text": {
+      "main": [
+        [
+          {
+            "node": "Intention Decryptor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interpreter Metadata": {
+      "main": [
+        [
+          {
+            "node": "Get metadata page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get metadata page": {
+      "main": [
+        [
+          {
+            "node": "Modify metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modify metadata": {
+      "main": [
+        [
+          {
+            "node": "Update a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page": {
+      "main": [
+        [
+          {
+            "node": "Metadata updated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Haiku": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Intention Decryptor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Interpreter Metadata",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "78141d19-9f6a-4fa9-87bf-50e47092fd91",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
+  },
+  "id": "JGq4Rp0sVV2NWjvZ",
+  "tags": []
+}
