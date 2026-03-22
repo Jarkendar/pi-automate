@@ -6,8 +6,9 @@ An AI-driven automation hub built on **n8n**, designed with an **"Automation-as-
 
 * **The Tech Visionary (Claude 4.5)**: Audits your tech stack (Kotlin, Android, KMP) to generate daily project ideas.
 * **The Market Analyst (Gemini 2.5)**: Monitors your portfolio and uses real-time Google Search to explain market movements.
-* **The Strategy Strategist (Claude 4.5 + Whisper)**: Transcribes your voice thoughts and builds technical Action Plans in Notion.
+* **The Ideas Strategist (Claude 4.5 + Whisper)**: Transcribes your voice thoughts and builds technical Action Plans in Notion.
 * **The Hidden Gems Guide (Claude 4.5)**: Curates seasonal, non-touristy travel inspirations based on current weather.
+* **The Private Trainer (Claude 4.5 + Whisper)**: Analyzes your Notion training history and Telegram voice updates to engineer adaptive workout plans and monitor physical progression.
 
 ---
 
