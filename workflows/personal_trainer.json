@@ -1,81 +1,19 @@
 {
-  "name": "Personal trainer",
+  "name": "personal_trainer",
   "nodes": [
     {
       "parameters": {
-        "hasOutputParser": true,
-        "options": {}
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"workout_type\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"Cardio\",\n        \"Rekreacja\",\n        \"HIIT\",\n        \"Siłowy\",\n        \"Basen\",\n        \"Rower\",\n        \"Rozciąganie\",\n        \"Inne\"\n      ],\n      \"description\": \"Dopasuj główny typ treningu.\"\n    },\n    \"training_plan\": {\n      \"type\": \"string\",\n      \"description\": \"Szczegółowy plan (Rozgrzewka, Plan Główny, Cool-down). Używaj formatowania Markdown. BĄDŹ ZWIĘZŁY - tekst MUSI mieć poniżej 1500 znaków. Język polski.\"\n    },\n    \"target_rpe\": {\n      \"type\": \"number\",\n      \"description\": \"Docelowe, sugerowane zmęczenie w skali 1-10.\"\n    },\n    \"motivation_comment\": {\n      \"type\": \"string\",\n      \"description\": \"Ludzki, krótki komentarz od trenera (po polsku). Nawiąż do obecnej formy użytkownika (na podstawie historii), wytłumacz krótko dlaczego taki plan i daj lekkiego kopa motywacyjnego.\"\n    }\n  },\n  \"required\": [\n    \"workout_type\",\n    \"training_plan\",\n    \"target_rpe\",\n    \"motivation_comment\"\n  ]\n}"
       },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        2176,
-        -656
-      ],
-      "id": "2d9251b5-9b00-4f32-b74f-df9df783396a",
-      "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "mode": "list",
-          "value": "claude-sonnet-4-5-20250929",
-          "cachedResultName": "Claude Sonnet 4.5"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
-      "typeVersion": 1.3,
-      "position": [
-        2096,
-        -416
-      ],
-      "id": "41979ada-83e2-4314-8176-45ca9200396d",
-      "name": "Anthropic Chat Model",
-      "credentials": {
-        "anthropicApi": {
-          "id": "qHSgWhy7lmBnmFr3",
-          "name": "Anthropic account"
-        }
-      }
-    },
-    {
-      "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        2400,
-        -416
+        2064,
+        -528
       ],
       "id": "313caea9-8277-49c4-b590-68e016eeffda",
       "name": "Structured Output Parser"
-    },
-    {
-      "parameters": {
-        "resource": "databasePage",
-        "operation": "getAll",
-        "databaseId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.notion",
-      "typeVersion": 2.2,
-      "position": [
-        1744,
-        -656
-      ],
-      "id": "592948cd-8024-4a97-bbc0-1d19cd918553",
-      "name": "Get many database pages",
-      "credentials": {
-        "notionApi": {
-          "id": "DuWEGsAmg63mAFH3",
-          "name": "Notion account"
-        }
-      }
     },
     {
       "parameters": {
@@ -95,259 +33,22 @@
     },
     {
       "parameters": {
-        "pageId": {
-          "__rl": true,
-          "mode": "url",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.notion",
-      "typeVersion": 2.2,
-      "position": [
-        1872,
-        -256
-      ],
-      "id": "1c514187-2341-45ef-99d9-abec2f6236f1",
-      "name": "Create a page",
-      "credentials": {
-        "notionApi": {
-          "id": "DuWEGsAmg63mAFH3",
-          "name": "Notion account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "pageId": {
-          "__rl": true,
-          "mode": "url",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.notion",
-      "typeVersion": 2.2,
-      "position": [
-        2624,
-        -656
-      ],
-      "id": "a2cc1924-56e9-4749-82ed-dddabbcc1a6b",
-      "name": "Create a page1",
-      "credentials": {
-        "notionApi": {
-          "id": "DuWEGsAmg63mAFH3",
-          "name": "Notion account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "rule": {
           "interval": [
-            {}
+            {
+              "triggerAtHour": 22
+            }
           ]
         }
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -864,
-        896
+        -688,
+        1104
       ],
       "id": "f4f186d8-2339-40f7-8a45-60e537f91247",
       "name": "Evening reminder"
-    },
-    {
-      "parameters": {
-        "resource": "databasePage",
-        "operation": "getAll",
-        "databaseId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.notion",
-      "typeVersion": 2.2,
-      "position": [
-        -656,
-        896
-      ],
-      "id": "10a22f72-5ba0-4a32-bd57-13b57f3238cd",
-      "name": "Get many database pages1",
-      "credentials": {
-        "notionApi": {
-          "id": "DuWEGsAmg63mAFH3",
-          "name": "Notion account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -448,
-        896
-      ],
-      "id": "e2a18b2e-054e-456f-8686-d29fe93d6a9a",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "6b728160-8663-459d-91ab-350dd5a742b2",
-              "leftValue": "",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -256,
-        896
-      ],
-      "id": "8858685d-a441-4d05-8be2-ea178af8f151",
-      "name": "mustRemind"
-    },
-    {
-      "parameters": {
-        "operation": "sendChatAction"
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        96,
-        752
-      ],
-      "id": "f4b119eb-a9c4-4f48-bb8d-2a3e5f437211",
-      "name": "Send a chat action",
-      "webhookId": "e36f2c6f-d0d7-461e-9124-3265e2d9b07a",
-      "credentials": {
-        "telegramApi": {
-          "id": "ZOlOngFYrZFu52vU",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -176,
-        416
-      ],
-      "id": "aa410224-d997-4c5b-bc29-b5958800e6da",
-      "name": "Code in JavaScript1"
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "4137811e-7916-4fd1-b85d-28026e426414"
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        32,
-        416
-      ],
-      "id": "de500e01-4f75-40e1-bcef-41018c90041e",
-      "name": "Switch1"
-    },
-    {
-      "parameters": {
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        2832,
-        -656
-      ],
-      "id": "cdf85122-8e7b-46e9-8b68-b013fc676311",
-      "name": "Send a text message1",
-      "webhookId": "772c7db1-75de-4322-b169-8556cc70bff1",
-      "credentials": {
-        "telegramApi": {
-          "id": "ZjHWTmIpacVmzoIV",
-          "name": "PersonalTrainer"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "databasePage",
-        "operation": "getAll",
-        "databaseId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.notionTool",
-      "typeVersion": 2.2,
-      "position": [
-        2304,
-        -448
-      ],
-      "id": "4db7f085-17de-4ef2-b01e-b02f2e6d0356",
-      "name": "Get many database pages in Notion",
-      "credentials": {
-        "notionApi": {
-          "id": "DuWEGsAmg63mAFH3",
-          "name": "Notion account"
-        }
-      }
     },
     {
       "parameters": {
@@ -943,49 +644,941 @@
           "name": "Anthropic account"
         }
       }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"date\": {\n      \"type\": \"string\",\n      \"description\": \"Calculated date in YYYY-MM-DD format. Return empty string '' if the user refers to the last workout.\"\n    },\n    \"workout_type\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"Cardio\",\n        \"Rekreacja\",\n        \"HIIT\",\n        \"Siłowy\",\n        \"Basen\",\n        \"Rower\",\n        \"Rozciąganie\",\n        \"Inne\"\n      ],\n      \"description\": \"Wybierz najbardziej pasującą kategorię. Jeśli żadna nie pasuje, wybierz 'Inne'.\"\n    },\n    \"status\": {\n      \"type\": \"string\",\n      \"enum\": [\"Done\", \"Rejected\", \"Todo\", \"In Progress\"]\n    },\n    \"rpe\": {\n      \"type\": \"number\"\n    },\n    \"comment\": {\n      \"type\": \"string\",\n      \"description\": \"Comment in Polish: feelings, pain, deviations.\"\n    },\n    \"training_plan\": {\n      \"type\": \"string\",\n      \"description\": \"List of exercises, sets, reps, and weights performed (in Polish). Return '' if not mentioned.\"\n    }\n  },\n  \"required\": [\"date\", \"workout_type\", \"status\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1936,
+        -176
+      ],
+      "id": "3e0e45e7-a031-4ce6-8e3c-fa4375df8c44",
+      "name": "Structured Modify Data Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a meticulous sports analyst. The user is reporting the execution of a workout (either planned or spontaneous).\n\nCRITICAL CONTEXT - TODAY'S DATE IS: {{ $now.setZone('Europe/Warsaw').toFormat('yyyy-MM-dd') }}.\n\nYour task is to extract the following data from the user's message and ALWAYS output the `comment` field in Polish.\n\nDATE CALCULATION RULES:\n- If the user explicitly says \"ostatni trening\", \"ostatnio\" (last workout, recently), you MUST output an empty string: \"\" for the `date` field.\n- If the user says \"dzisiaj\" (today) or does not mention any time/date context at all: use TODAY'S date in YYYY-MM-DD.\n- If the user says \"wczoraj\" (yesterday): calculate the date for 1 day before TODAY in YYYY-MM-DD.\n- If the user mentions a specific day (e.g., \"we wtorek\"), calculate the exact date in YYYY-MM-DD.\n\nEXTRACT:\n1. date: The calculated date in YYYY-MM-DD, or \"\" if it refers to the \"last\" workout.\n2. workout_type: A short workout type (e.g., Rower, Bieganie, Siłownia). If not specified, output \"Inne\".\n3. status: Always \"Done\", unless the user states they aborted (\"Rejected\").\n4. rpe: RPE scale 1-10. Return 0 if not mentioned.\n5. comment: [IN POLISH] Deviations from plan, feelings, pain. Return \"\" if nothing mentioned.\n6. training_plan: [IN POLISH] A detailed list of exercises performed, including sets, reps, weights, or distances mentioned by the user. If the user just says \"I did my plan\", describe it briefly. Return \"\" if no specific exercises are mentioned. Duration if exist. \n\nUser message:\n{{ $('Unified Text').item.json.final_message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1792,
+        -336
+      ],
+      "id": "c6d7e000-be47-4e04-8541-52740286e02c",
+      "name": "Interpreter Data Modify"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "limit": 1,
+        "simple": "={{ true }}",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Date|created_time",
+              "condition": "equals",
+              "createdTimeValue": "={{ $json.output.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2352,
+        -448
+      ],
+      "id": "1c514187-2341-45ef-99d9-abec2f6236f1",
+      "name": "Get training by date",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dc6dd944-a792-45f0-8277-10d042e52a9c",
+              "leftValue": "={{ $json.output.date }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2144,
+        -336
+      ],
+      "id": "b1d2d2ad-eecd-40a6-a4f7-743761eb7100",
+      "name": "isDateExist"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "limit": 1,
+        "simple": "={{ true }}",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "In progress"
+            },
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "Not started"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Date|created_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2352,
+        -240
+      ],
+      "id": "a0444e57-87fc-4ca8-a841-720f3b760fec",
+      "name": "Get latest training",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ade365ca-bd9b-418e-a9f1-2b27a4abe74f",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2560,
+        -336
+      ],
+      "id": "d7214ed1-b7be-4c17-9f00-50ac58d8cfd6",
+      "name": "isTrainingExist",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "title": "={{ $('Interpreter Data Modify').item.json.output.workout_type }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Comment|rich_text",
+              "textContent": "={{ $('Interpreter Data Modify').item.json.output.comment }}"
+            },
+            {
+              "key": "RPE [1-10]|number",
+              "numberValue": "={{ $('Interpreter Data Modify').item.json.output.rpe }}"
+            },
+            {
+              "key": "Status|status",
+              "statusValue": "={{ $('Interpreter Data Modify').item.json.output.status }}"
+            },
+            {
+              "key": "Training plan|rich_text",
+              "textContent": "={{ $('Interpreter Data Modify').item.json.output.training_plan }}"
+            },
+            {
+              "key": "Training Type|title",
+              "title": "={{ $('Interpreter Data Modify').item.json.output.workout_type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2768,
+        -240
+      ],
+      "id": "5156b59b-5ab5-48ee-9934-4142390f8791",
+      "name": "Create training",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Comment|rich_text",
+              "textContent": "={{ $('Interpreter Data Modify').item.json.output.comment }}"
+            },
+            {
+              "key": "RPE [1-10]|number",
+              "numberValue": "={{ $('Interpreter Data Modify').item.json.output.rpe }}"
+            },
+            {
+              "key": "Status|status",
+              "statusValue": "={{ $('Interpreter Data Modify').item.json.output.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2768,
+        -448
+      ],
+      "id": "38ca56fd-db89-4030-9a45-b630cfbce900",
+      "name": "Update a existing training",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Personal Trainer').item.json.message.chat.id }}",
+        "text": "=✅ Trening zapisany w Dzienniczku! \n🏋️ Typ: {{ $('Interpreter Data Modify').item.json.output.workout_type }} \n📅 Data: {{ $('Interpreter Data Modify').item.json.output.date \n 'Dzisiaj' }} \n📊 Status: {{ $('Interpreter Data Modify').item.json.output.status }} \n🔋 RPE: {{ $('Interpreter Data Modify').item.json.output.rpe > 0 ? $('Interpreter Data Modify').item.json.output.rpe : 'Brak' }}  \n📝 Notatka: {{ $('Interpreter Data Modify').item.json.output.comment \n\n 'Brak uwag.' }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2976,
+        -336
+      ],
+      "id": "823fdd69-ef25-47d7-a239-cbdec65e2ce8",
+      "name": "Send confirm data modify",
+      "webhookId": "25dfccde-c870-4bcc-be71-402aa06ddbe1",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an elite personal trainer and advanced sports analyst. Your objective is to create a personalized, optimal workout plan for today.\n\nANALYZING METADATA (PROFILE LOG):\nYou will receive the user's profile data as a chronological log of updates. You MUST deduce the user's CURRENT state.\n- If equipment was bought and later sold, the user currently does NOT have it.\n- Use the most recent weight, injuries, and goals.\n- Pay attention to access cards (e.g., gym pass, pool pass) or available home equipment, as this determines what kind of training is possible.\n\nWORKOUT PLANNING RULES:\n1. Time limit: The entire workout block (warmup, main workout, cooldown, changing clothes/shower) must fit within 1.5 hours (approx. 60-70 mins of pure activity). Overrule this ONLY if the user explicitly requests a longer session.\n2. Progression (Golden Rule): Push for continuous growth. Analyze the last 10 workouts and provide a stimulus for progress (increase weight, add reps, shorten rest, or increase distance).\n3. Progression Exception: Apply a recovery, deload, or maintenance workout ONLY if the user explicitly asks for it today, OR if their recent RPE and comments clearly indicate extreme fatigue or pain.\n4. Safety: Do not overtrain muscle groups trained in the last 48 hours. Avoid exercises that aggravate reported injuries.\n\nALL OUTPUT TEXT (plan, comments) MUST BE IN POLISH.\n\nINPUT DATA:\n\n[USER PROFILE METADATA LOG]\n{{ JSON.stringify($('Get metadata').all()) }}\n\n[LAST 10 WORKOUTS HISTORY]\n{{ JSON.stringify($('Get last training logs').all()) }}\n\n[USER'S REQUEST FOR TODAY]\n{{ $('Unified Text').item.json.final_message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1920,
+        -688
+      ],
+      "id": "2d9251b5-9b00-4f32-b74f-df9df783396a",
+      "name": "Personal Trainer Bot",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "329a4a757d6180b8a1afef339a45eca3",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        -688
+      ],
+      "id": "5fb9f2e1-560c-4f75-adee-e92353992c44",
+      "name": "Get metadata",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "Done"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Date|created_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        -688
+      ],
+      "id": "592948cd-8024-4a97-bbc0-1d19cd918553",
+      "name": "Get last training logs",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        1920,
+        -528
+      ],
+      "id": "41979ada-83e2-4314-8176-45ca9200396d",
+      "name": "Anthropic Sonnet",
+      "credentials": {
+        "anthropicApi": {
+          "id": "qHSgWhy7lmBnmFr3",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "title": "={{ $json.output.workout_type }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Not started"
+            },
+            {
+              "key": "Training plan|rich_text",
+              "textContent": "={{ ($json.output.training_plan || '').substring(0, 1950) }}"
+            },
+            {
+              "key": "Training Type|title",
+              "title": "={{ $json.output.workout_type }}"
+            },
+            {
+              "key": "RPE [1-10]|number",
+              "numberValue": "={{ $json.output.target_rpe }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2272,
+        -688
+      ],
+      "id": "a2cc1924-56e9-4749-82ed-dddabbcc1a6b",
+      "name": "Create training plan",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Personal Trainer').item.json.message.chat.id }}",
+        "text": "=💪 **Plan na dzisiaj gotowy!**\n\n🗣️ *Słowo od trenera:*\n{{ $('Personal Trainer Bot').item.json.output.motivation_comment }}\n\n🏋️ **Typ:** {{ $('Personal Trainer Bot').item.json.output.workout_type }}\n🎯 **Docelowe RPE:** {{ $('Personal Trainer Bot').item.json.output.target_rpe }}/10\n\n📝 **Twój trening:**\n{{ $('Personal Trainer Bot').item.json.output.training_plan }}\n\n🔥 Jak skończysz, po prostu napisz mi, jak poszło!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2480,
+        -688
+      ],
+      "id": "cdf85122-8e7b-46e9-8b68-b013fc676311",
+      "name": "Send training",
+      "webhookId": "772c7db1-75de-4322-b169-8556cc70bff1",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "329a4a75-7d61-8090-ab08-e790391ffc8e",
+          "mode": "list",
+          "cachedResultName": "Training History",
+          "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "In progress"
+            },
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "Not started"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Date|created_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        1104
+      ],
+      "id": "10a22f72-5ba0-4a32-bd57-13b57f3238cd",
+      "name": "Get last not end training",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8ab8335c-b446-48d9-96e3-c08c186927e2",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        1104
+      ],
+      "id": "0e847b2f-1c98-4200-a099-7e0fb6d52f89",
+      "name": "isExist"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_ID_PERSONAL_TRAINER_CHAT }}",
+        "text": "=Hej! 🔔 Przypominajka:  Czy wykonałeś już trening **{{ $json.property_training_type }}** zaplanowany na dzisiaj {{ DateTime.fromISO($json.property_date).setZone('Europe/Warsaw').toFormat('dd.MM.yyyy') }}?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Zrobiłem",
+                    "additionalFields": {
+                      "callback_data": "=status_done:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "=⏳ Właśnie robię",
+                    "additionalFields": {
+                      "callback_data": "=status_in_progress:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "❌ Nie zrobię",
+                    "additionalFields": {
+                      "callback_data": "=status_rejected:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        1088
+      ],
+      "id": "f4b119eb-a9c4-4f48-bb8d-2a3e5f437211",
+      "name": "Send a text message",
+      "webhookId": "e36f2c6f-d0d7-461e-9124-3265e2d9b07a",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2865578-fabf-4752-8d64-1da7c375b825",
+              "name": "action",
+              "value": "={{ $json.callback_query.data.split(':')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "d6e022f2-31a2-4de4-8843-6302787000b1",
+              "name": "page_id",
+              "value": "={{ $json.callback_query.data.split(':')[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        688
+      ],
+      "id": "99de5461-2818-44f3-8ab3-e5f30060ffbd",
+      "name": "Set callback variables"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "status_done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4137811e-7916-4fd1-b85d-28026e426414"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Done"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f5fc6fea-3c20-4eb8-8217-63bbb63e3e9c",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "status_in_progress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "InProgress"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f6201adb-9363-42c9-928e-5743ab6cdad7",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "status_rejected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        672
+      ],
+      "id": "de500e01-4f75-40e1-bcef-41018c90041e",
+      "name": "Choose action"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.page_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        528
+      ],
+      "id": "20a5caa8-a663-40b8-8e10-f91030cc73f4",
+      "name": "Set training done",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.page_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "In progress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        688
+      ],
+      "id": "eae75b30-6824-4cfd-a2b8-c1de7639b8e6",
+      "name": "Set training inProgress",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.page_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        848
+      ],
+      "id": "33246301-5498-4d16-b36b-39f0d64d7da6",
+      "name": "Set training rejected",
+      "credentials": {
+        "notionApi": {
+          "id": "DuWEGsAmg63mAFH3",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Personal Trainer').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Personal Trainer').item.json.callback_query.message.message_id }}",
+        "text": "✅ Gotowe! Twój wybór został zapisany w Dzienniczku! 💪",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        688
+      ],
+      "id": "61e2d81b-c73d-4147-8ab0-b2148cb3156e",
+      "name": "Edit a text message",
+      "webhookId": "fbc0e65b-a6ef-40c8-a2f0-fd5256d09907",
+      "credentials": {
+        "telegramApi": {
+          "id": "ZjHWTmIpacVmzoIV",
+          "name": "PersonalTrainer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Clickable callback",
+        "height": 512,
+        "width": 896
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "91df9794-fb69-442b-8a8e-052338c872a5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Daily reminder",
+        "height": 208,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -736,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "a1d00fbb-ad61-4921-b300-265c94fd3fe5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Trainer",
+        "height": 1120,
+        "width": 3488
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        -720
+      ],
+      "typeVersion": 1,
+      "id": "b07ba725-13e0-4525-8162-bbe7d6308ceb",
+      "name": "Sticky Note2"
     }
   ],
   "pinData": {},
   "connections": {
-    "Anthropic Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Structured Output Parser": {
       "ai_outputParser": [
         [
           {
-            "node": "AI Agent",
+            "node": "Personal Trainer Bot",
             "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Create a page1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many database pages": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
             "index": 0
           }
         ]
@@ -1006,79 +1599,8 @@
       "main": [
         [
           {
-            "node": "Get many database pages1",
+            "node": "Get last not end training",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many database pages1": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "mustRemind",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "mustRemind": {
-      "main": [
-        [
-          {
-            "node": "Send a chat action",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript1": {
-      "main": [
-        [
-          {
-            "node": "Switch1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a page": {
-      "main": [
-        []
-      ]
-    },
-    "Create a page1": {
-      "main": [
-        [
-          {
-            "node": "Send a text message1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many database pages in Notion": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -1106,7 +1628,7 @@
         ],
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "Set callback variables",
             "type": "main",
             "index": 0
           }
@@ -1191,14 +1713,14 @@
       "main": [
         [
           {
-            "node": "Get many database pages",
+            "node": "Get metadata",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Create a page",
+            "node": "Interpreter Data Modify",
             "type": "main",
             "index": 0
           }
@@ -1297,18 +1819,271 @@
             "node": "Interpreter Metadata",
             "type": "ai_languageModel",
             "index": 0
+          },
+          {
+            "node": "Interpreter Data Modify",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Modify Data Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Interpreter Data Modify",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interpreter Data Modify": {
+      "main": [
+        [
+          {
+            "node": "isDateExist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get training by date": {
+      "main": [
+        [
+          {
+            "node": "isTrainingExist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isDateExist": {
+      "main": [
+        [
+          {
+            "node": "Get training by date",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get latest training",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get latest training": {
+      "main": [
+        [
+          {
+            "node": "isTrainingExist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isTrainingExist": {
+      "main": [
+        [
+          {
+            "node": "Update a existing training",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create training",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create training": {
+      "main": [
+        [
+          {
+            "node": "Send confirm data modify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a existing training": {
+      "main": [
+        [
+          {
+            "node": "Send confirm data modify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personal Trainer Bot": {
+      "main": [
+        [
+          {
+            "node": "Create training plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get metadata": {
+      "main": [
+        [
+          {
+            "node": "Get last training logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get last training logs": {
+      "main": [
+        [
+          {
+            "node": "Personal Trainer Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Personal Trainer Bot",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create training plan": {
+      "main": [
+        [
+          {
+            "node": "Send training",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get last not end training": {
+      "main": [
+        [
+          {
+            "node": "isExist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isExist": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set callback variables": {
+      "main": [
+        [
+          {
+            "node": "Choose action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose action": {
+      "main": [
+        [
+          {
+            "node": "Set training done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set training inProgress",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set training rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set training rejected": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set training inProgress": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set training done": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "78141d19-9f6a-4fa9-87bf-50e47092fd91",
+  "versionId": "b5fdc23a-fdea-4e71-b7c9-c0590329b3ea",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
