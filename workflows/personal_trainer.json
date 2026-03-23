@@ -1009,6 +1009,7 @@
           "cachedResultName": "Training History",
           "cachedResultUrl": "https://www.notion.so/329a4a757d618090ab08e790391ffc8e"
         },
+        "limit": 10,
         "filterType": "manual",
         "filters": {
           "conditions": [
@@ -1038,6 +1039,7 @@
       ],
       "id": "592948cd-8024-4a97-bbc0-1d19cd918553",
       "name": "Get last training logs",
+      "alwaysOutputData": true,
       "credentials": {
         "notionApi": {
           "id": "DuWEGsAmg63mAFH3",
@@ -2083,11 +2085,42 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "b5fdc23a-fdea-4e71-b7c9-c0590329b3ea",
+  "versionId": "cbb082a9-75b7-4b2e-9677-fcae919738d2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
   },
   "id": "JGq4Rp0sVV2NWjvZ",
-  "tags": []
+  "tags": [
+    {
+      "updatedAt": "2026-03-12T07:14:31.974Z",
+      "createdAt": "2026-03-12T07:14:31.974Z",
+      "id": "OqaaPle0q9sJnyCh",
+      "name": "AI"
+    },
+    {
+      "updatedAt": "2026-03-17T11:59:48.441Z",
+      "createdAt": "2026-03-17T11:59:48.441Z",
+      "id": "bp1lAefUYhScZun2",
+      "name": "telegram"
+    },
+    {
+      "updatedAt": "2026-03-12T07:14:31.968Z",
+      "createdAt": "2026-03-12T07:14:31.968Z",
+      "id": "LMI2wwmKQQRYls3c",
+      "name": "mail"
+    },
+    {
+      "updatedAt": "2026-03-17T11:59:51.752Z",
+      "createdAt": "2026-03-17T11:59:51.752Z",
+      "id": "FU6FA66mQdOPtp3I",
+      "name": "whisper"
+    },
+    {
+      "name": "notion",
+      "id": "rwl4HfzMUFLgBUnA",
+      "updatedAt": "2026-03-23T09:29:07.731Z",
+      "createdAt": "2026-03-23T09:29:07.731Z"
+    }
+  ]
 }
