@@ -1,6 +1,6 @@
 services:
   n8n:
-    image: n8nio/n8n:2.10.4
+    image: n8nio/n8n:2.13.2
     container_name: n8n_pi_automate
     restart: unless-stopped
     ports:
@@ -19,7 +19,7 @@ services:
       - n8n-network
 
   n8n-python-runner:
-    image: n8nio/runners:2.10.4
+    image: n8nio/runners:2.13.2
     container_name: n8n_worker
     restart: unless-stopped
     environment:
