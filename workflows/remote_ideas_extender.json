@@ -785,7 +785,7 @@
       "typeVersion": 2.2,
       "position": [
         -1600,
-        944
+        880
       ],
       "id": "5c2193b7-d179-4cf9-8c71-4f5edb5d9d7b",
       "name": "Reject idea",
@@ -1254,7 +1254,13 @@
             "index": 0
           }
         ],
-        [],
+        [
+          {
+            "node": "Send confirm",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Set InProgress",
@@ -1334,13 +1340,13 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "259fdfa4-3a88-4a9e-8e37-4492d18a249a",
+  "versionId": "54e2d4a7-72b9-45b4-92e7-e692faae6d35",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
