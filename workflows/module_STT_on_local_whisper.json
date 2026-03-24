@@ -1,0 +1,139 @@
+{
+  "name": "module_STT_on_local_whisper",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://speaches:8000/v1/audio/transcriptions",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "Systran/faster-whisper-small"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3874ddc2-9ae9-484e-8fab-bc7adebfae92",
+      "name": "Parse audio file"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "324dbaef-b327-4e67-b8a8-2becf01893d0",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "bdfb6e36-7275-4831-ae0e-fed5ca20fe28",
+      "name": "Get parsed text"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "data",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "11579851-86f0-4a56-95cf-0128487e4efd",
+      "name": "Start flow with data"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Parse audio file": {
+      "main": [
+        [
+          {
+            "node": "Get parsed text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get parsed text": {
+      "main": [
+        []
+      ]
+    },
+    "Start flow with data": {
+      "main": [
+        [
+          {
+            "node": "Parse audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0c390b01-adfc-47c0-80f7-f6e6440bff13",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
+  },
+  "id": "Nn2BEWgsDw8njSLw",
+  "tags": [
+    {
+      "updatedAt": "2026-03-17T11:59:51.752Z",
+      "createdAt": "2026-03-17T11:59:51.752Z",
+      "id": "FU6FA66mQdOPtp3I",
+      "name": "whisper"
+    },
+    {
+      "updatedAt": "2026-03-17T11:59:48.441Z",
+      "createdAt": "2026-03-17T11:59:48.441Z",
+      "id": "bp1lAefUYhScZun2",
+      "name": "telegram"
+    },
+    {
+      "name": "module",
+      "id": "l0LuWpmQ5Bo1KiFe",
+      "updatedAt": "2026-03-24T12:32:09.443Z",
+      "createdAt": "2026-03-24T12:32:09.443Z"
+    }
+  ]
+}
