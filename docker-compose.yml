@@ -19,7 +19,7 @@ services:
       - n8n-network
 
   n8n-python-runner:
-    image: n8nio/runners:2.13.2
+    build: ./runner
     container_name: n8n_worker
     restart: unless-stopped
     environment:
