@@ -54,7 +54,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1984,
+        -2080,
         304
       ],
       "id": "c1b22c53-5a98-440e-aad2-3dc292127e40",
@@ -134,7 +134,7 @@
         "text": "={{ $json.text }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "ROLE: Senior Project Engineer & Productivity Strategist.\n\nOBJECTIVE: Analyze incoming thoughts and convert them into a structured JSON Action Plan. You are a strict data processor, NOT a conversational chatbot.\n\nCLASSIFICATION LOGIC:\n- status = \"accepted\": Use this ONLY if the input contains a concrete project idea, a specific task, or a technical problem with enough context to create actionable steps.\n- status = \"rejected\": Use this if the input is a shopping list, a single word, incoherent gibberish, OR an incomplete/cut-off sentence (e.g., \"Mam pomysł na...\", \"Muszę dzisiaj...\").\n\nJSON STRUCTURE GUIDELINES (Strict adherence required):\n- goal: Define the technical essence of the request in one short sentence. (If rejected, put \"Brak celu\").\n- action_plan: Provide an array of 3-5 strings. Each must follow the format: \"Task description (~X min/h)\". (If rejected, provide an array with one string: [\"Brak zadań\"]).\n- total_estimated_time: Sum of all tasks (e.g., \"~1h 45min\"). (If rejected, put \"0 min\").\n- engineer_comment: A high-level technical insight. IF REJECTED due to incomplete input, use this field to professionally state that the thought was cut off and you need the rest of the sentence.\n\nOUTPUT RULES:\n- CRITICAL: You MUST provide the output EXACTLY as a raw JSON object compatible with the attached Structured Output Parser.\n- NEVER respond with conversational text, greetings, or follow-up questions outside the JSON structure.\n- If the input is incomplete, DO NOT ask the user to complete it in plain text. Just return the JSON with status \"rejected\".\n- Always output the values in Polish (except for the JSON keys)."
+          "systemMessage": "{{ $('Get prompt').item.json.data }}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -1025,6 +1025,20 @@
       ],
       "id": "ff6eb17a-d175-42b4-939a-c82020638465",
       "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/Jarkendar/prompt-vault/refs/heads/main/prompts/productivity/thought-to-action-plan.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1888,
+        288
+      ],
+      "id": "f78636b6-592a-462f-8fa1-8b497137296a",
+      "name": "Get prompt"
     }
   ],
   "pinData": {},
@@ -1044,7 +1058,7 @@
       "main": [
         [
           {
-            "node": "Input format switch",
+            "node": "Get prompt",
             "type": "main",
             "index": 0
           }
@@ -1338,6 +1352,17 @@
           }
         ]
       ]
+    },
+    "Get prompt": {
+      "main": [
+        [
+          {
+            "node": "Input format switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1346,7 +1371,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "54e2d4a7-72b9-45b4-92e7-e692faae6d35",
+  "versionId": "67b56410-3dbd-4ed3-88e7-cf9ed0adaa2a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
