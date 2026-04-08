@@ -63,7 +63,7 @@
     {
       "parameters": {
         "resource": "file",
-        "fileId": "={{ $json.message.voice.file_id }}",
+        "fileId": "={{ $('Is message from good bot').item.json.message.voice.file_id }}",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegram",
@@ -89,7 +89,7 @@
             {
               "id": "3023006c-0ff3-46ef-bcc9-71d49317c883",
               "name": "text",
-              "value": "={{ $json.message.text }}",
+              "value": "={{ $('Is message from good bot').item.json.message.text }}",
               "type": "string"
             }
           ]
@@ -280,7 +280,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $json.message.text }}",
+                    "leftValue": "={{ $('Is message from good bot').item.json.message.text }}",
                     "rightValue": "",
                     "operator": {
                       "type": "string",
@@ -306,7 +306,7 @@
                 "conditions": [
                   {
                     "id": "82e37cdd-3812-4ced-891e-16eb760c8190",
-                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "leftValue": "={{ $('Is message from good bot').item.json.message.voice.file_id }}",
                     "rightValue": "",
                     "operator": {
                       "type": "string",
@@ -1371,7 +1371,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "67b56410-3dbd-4ed3-88e7-cf9ed0adaa2a",
+  "versionId": "3a0048a1-fa00-414a-b6e4-b2f497b5975b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
