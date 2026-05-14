@@ -1,0 +1,51 @@
+# Courses Hub - reverse proxy, basic auth, static files
+#
+# Auth credentials are pulled from .env:
+#   COURSES_HUB_USER       - username (default "jarek")
+#   COURSES_HUB_PASS_HASH  - bcrypt hash (generate with `make courses-auth`)
+#
+# Bind to `courses.lan` and also serve on raw IP (no Host requirement).
+# For nice URL: add `<IP_RPi>  courses.lan` in your router's local DNS
+# (AdGuard/Pi-hole) or /etc/hosts on each device.
+
+{
+	admin off
+	log {
+		output stdout
+		format console
+		level INFO
+	}
+}
+
+courses.lan, http:// {
+	basicauth {
+		{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
+	}
+
+	encode zstd gzip
+
+	# API -> backend (resolved via Docker DNS in the n8n-network)
+	handle /api/* {
+		reverse_proxy courses_hub_pi_automate:8000 {
+			transport http {
+				dial_timeout 5s
+				response_header_timeout 15s
+			}
+		}
+	}
+
+	# Static course HTMLs (private, mounted from ./courses_patched)
+	handle_path /courses/* {
+		root * /srv/courses
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
+	}
+
+	# Dashboard + adapter (mounted from ./courses_hub_frontend)
+	handle {
+		root * /srv/frontend
+		try_files {path} /index.html
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
+	}
+}

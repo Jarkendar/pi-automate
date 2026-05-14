@@ -1,0 +1,22 @@
+# Optional overrides for auto-detected course titles.
+# Copy to courses.local.yaml (gitignored) and edit for your courses.
+#
+# Key = course_id (auto-detected from `slug:` field in the HTML or from the
+# filename without the "course-" prefix). Value = object with a `title` field.
+#
+# Title resolution order:
+#   1. Override defined in this file (wins)
+#   2. COURSE.title literal in the HTML (when present and not a module title)
+#   3. Humanized slug (e.g. "android-architecture" -> "Android Architecture")
+
+android-architecture:
+  title: "Android - Architektura"
+
+kmp:
+  title: "Kotlin Multiplatform"
+
+biznes-tech-communication:
+  title: "Biznes - Komunikacja Tech"
+
+biznes-modul1-podsumowanie:
+  title: "Biznes - Moduł 1 (podsumowanie)"

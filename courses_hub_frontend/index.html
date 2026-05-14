@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<title>Courses Hub · pi-automate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='22'%3E📚%3C/text%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.21.0/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --text: #1a1915;
+    --text-secondary: #6b6964;
+    --text-muted: #9a9892;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.16);
+    --accent: #c96442;
+    --accent-soft: #faece7;
+    --success: #1d9e75;
+    --success-soft: #e1f5ee;
+    --progress-track: #ebe9e1;
+    --radius: 12px;
+    --radius-sm: 8px;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1915;
+      --surface: #232120;
+      --text: #f5f4ef;
+      --text-secondary: #b5b3ad;
+      --text-muted: #7a7872;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.16);
+      --accent: #d97757;
+      --accent-soft: #3a1f15;
+      --success: #5dcaa5;
+      --success-soft: #0f3025;
+      --progress-track: #2c2a28;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 48px 24px 64px; }
+  header { margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 {
+    font-size: 28px; font-weight: 500; margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header .sub { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+  header .sub a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 32px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-value { font-size: 24px; font-weight: 500; margin-top: 4px; }
+  .courses { display: flex; flex-direction: column; gap: 12px; }
+  .course {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 0.15s ease;
+  }
+  .course:hover { border-color: var(--border-strong); }
+  .course-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .course-title { font-size: 16px; font-weight: 500; margin: 0; }
+  .course-percent {
+    font-size: 14px; font-weight: 500; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .course-percent.done { color: var(--success); }
+  .progress {
+    height: 6px; background: var(--progress-track); border-radius: 999px;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .progress-fill.done { background: var(--success); }
+  .course-meta {
+    display: flex; gap: 16px; font-size: 12px; color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .course-meta span i { margin-right: 4px; font-size: 14px; vertical-align: -2px; }
+  .empty {
+    text-align: center; padding: 64px 24px; color: var(--text-secondary);
+    background: var(--surface); border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+  }
+  .empty i { font-size: 32px; display: block; margin-bottom: 12px; color: var(--text-muted); }
+  .empty code { background: var(--accent-soft); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--accent); }
+  footer {
+    margin-top: 48px; text-align: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  footer a { color: var(--text-secondary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 999px; background: var(--success-soft); color: var(--success);
+    font-weight: 500; vertical-align: middle; margin-left: 8px;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--progress-track) 0%, var(--surface) 50%, var(--progress-track) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: var(--radius);
+    height: 80px;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Courses Hub</h1>
+        <div class="sub">moduł <a href="https://github.com/Jarkendar/pi-automate" target="_blank">pi-automate</a></div>
+      </div>
+      <a href="/api/v1/docs" style="font-size:13px; color: var(--text-secondary); text-decoration:none;">
+        <i class="ti ti-code"></i> API
+      </a>
+    </header>
+
+    <div class="stats" id="stats"></div>
+    <div id="content">
+      <div class="skeleton" style="margin-bottom:12px"></div>
+      <div class="skeleton" style="margin-bottom:12px"></div>
+      <div class="skeleton"></div>
+    </div>
+
+    <footer>
+      Dane synchronizowane do <code style="font-family:ui-monospace, monospace; font-size:11px;">./courses_data/courses.db</code>
+    </footer>
+  </div>
+
+<script>
+// Hybrid manifest: try /courses/manifest.json first; fall back to course list from API.
+// The manifest is generated by scripts/patch-courses.py and lives next to the HTML files.
+async function loadManifest() {
+  try {
+    const res = await fetch("/courses/manifest.json", { credentials: "include" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return await res.json();   // { courses: [{ id, title, file, noProgress? }] }
+  } catch (e) {
+    console.info("No manifest.json — will use API course list instead.");
+    return null;
+  }
+}
+
+async function fetchSummaries() {
+  try {
+    const res = await fetch("/api/v1/courses", { credentials: "include" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const arr = await res.json();
+    const map = {};
+    for (const s of arr) map[s.course_id] = s;
+    return map;
+  } catch (e) {
+    console.warn("Cannot fetch course summaries:", e);
+    return {};
+  }
+}
+
+function renderStats(courses, summaries) {
+  const tracked = courses.filter(c => !c.noProgress);
+  const totalCourses = tracked.length;
+  const all = tracked.map(c => summaries[c.id]).filter(Boolean);
+  const totalLessons = all.reduce((s, c) => s + (c.total_lessons || 0), 0);
+  const completed   = all.reduce((s, c) => s + (c.completed || 0), 0);
+  const inProgress  = all.reduce((s, c) => s + (c.in_progress || 0), 0);
+  const notes       = all.reduce((s, c) => s + (c.notes_count || 0), 0);
+  const pct = totalLessons ? Math.round(100 * completed / totalLessons) : 0;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><div class="stat-label">Kursy</div><div class="stat-value">${totalCourses}</div></div>
+    <div class="stat"><div class="stat-label">Postęp ogólny</div><div class="stat-value">${pct}%</div></div>
+    <div class="stat"><div class="stat-label">Ukończone</div><div class="stat-value">${completed}/${totalLessons || "—"}</div></div>
+    <div class="stat"><div class="stat-label">W trakcie</div><div class="stat-value">${inProgress}</div></div>
+    <div class="stat"><div class="stat-label">Notatki</div><div class="stat-value">${notes}</div></div>
+  `;
+}
+
+function renderCourses(courses, summaries) {
+  const c = document.getElementById("content");
+  if (!courses.length) {
+    c.innerHTML = `
+      <div class="empty">
+        <i class="ti ti-books"></i>
+        <div>Brak kursów. Wrzuć HTML-e do <code>./courses_src/</code> i uruchom <code>make courses-patch</code>.</div>
+      </div>`;
+    return;
+  }
+
+  c.innerHTML = `<div class="courses">${courses.map(course => {
+    const s = summaries[course.id];
+    if (course.noProgress) {
+      return `
+        <a class="course" href="/courses/${course.file}">
+          <div class="course-head">
+            <h2 class="course-title">${course.title} <span class="badge">statyczny</span></h2>
+            <div class="course-percent"><i class="ti ti-external-link"></i></div>
+          </div>
+          <div class="course-meta">
+            <span><i class="ti ti-book"></i> Czytaj</span>
+          </div>
+        </a>`;
+    }
+
+    const pct = s ? s.progress_percent : 0;
+    const done = pct >= 100;
+    const total = s ? s.total_lessons : "?";
+    const completed = s ? s.completed : 0;
+    const notes = s ? s.notes_count : 0;
+    const updated = s && s.updated_at
+      ? new Date(s.updated_at).toLocaleDateString("pl-PL", { day: "numeric", month: "short" })
+      : "—";
+
+    return `
+      <a class="course" href="/courses/${course.file}">
+        <div class="course-head">
+          <h2 class="course-title">${course.title}</h2>
+          <div class="course-percent ${done ? "done" : ""}">${Math.round(pct)}%</div>
+        </div>
+        <div class="progress"><div class="progress-fill ${done ? "done" : ""}" style="width:${pct}%"></div></div>
+        <div class="course-meta">
+          <span><i class="ti ti-circle-check"></i> ${completed}/${total} ukończone</span>
+          <span><i class="ti ti-note"></i> ${notes} ${notes === 1 ? "notatka" : "notatki"}</span>
+          <span><i class="ti ti-clock"></i> ${updated}</span>
+        </div>
+      </a>`;
+  }).join("")}</div>`;
+}
+
+(async function init() {
+  const [manifest, summaries] = await Promise.all([loadManifest(), fetchSummaries()]);
+
+  let courses;
+  if (manifest && manifest.courses) {
+    courses = manifest.courses;
+  } else {
+    // Fallback: derive course list from API summaries
+    courses = Object.values(summaries).map(s => ({
+      id: s.course_id,
+      title: s.title || s.course_id,
+      file: s.course_id + ".html",
+    }));
+  }
+
+  renderStats(courses, summaries);
+  renderCourses(courses, summaries);
+})();
+</script>
+</body>
+</html>

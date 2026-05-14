@@ -9,3 +9,18 @@ n8n_data/
 .DS_Store
 npm-debug.log*
 node_modules/
+
+# Private data - never commit
+courses_src/
+courses_patched/
+courses_data/
+caddy_data/
+caddy_config/
+
+# Local title overrides (private)
+courses.local.yaml
+
+# Backups
+.env.bak
+caddy/Caddyfile.bak
+backups/

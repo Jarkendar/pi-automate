@@ -55,7 +55,40 @@ services:
       command: http --domain=${NGROK_DOMAIN} n8n_pi_automate:5678
       networks:
         - n8n-network
+  courses-hub:
+    build: ./courses_hub_backend
+    container_name: courses_hub_pi_automate
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DB_PATH=/data/courses.db
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://courses.lan,http://localhost
+      - N8N_WEBHOOK_URL=${COURSES_HUB_N8N_WEBHOOK_URL:-}
+    volumes:
+      - ./courses_data:/data
+    networks:
+      - n8n-network
 
+  courses-caddy:
+    image: caddy:2-alpine
+    container_name: courses_caddy_pi_automate
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./courses_patched:/srv/courses:ro
+      - ./courses_hub_frontend:/srv/frontend:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    depends_on:
+      - courses-hub
+    networks:
+      - n8n-network
 networks:
   n8n-network:
     driver: bridge
