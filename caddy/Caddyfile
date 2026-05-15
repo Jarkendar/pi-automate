@@ -20,20 +20,18 @@
 http://, http://courses.lan {
 	encode zstd gzip
 
-	# Named matchers
-	@module_api      path /dashboard/courses/api/*
-	@module_courses  path /dashboard/courses/courses/*
-	@module_root     path /dashboard/courses /dashboard/courses/
-	@module_static   path_regexp moduleStatic ^/dashboard/courses/(?!api/|courses/).+$
-
 	# Basic auth for the whole module
 	@module path /dashboard/courses /dashboard/courses/*
-	basicauth @module {
+	basic_auth @module {
 		{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
 	}
 
+	# Caddy sorts `handle` directives by specificity (longer prefix wins).
+	# So /dashboard/courses/api/* matches before /dashboard/courses/* even
+	# though both are declared at the same level.
+
 	# 1. API -> backend
-	handle @module_api {
+	handle /dashboard/courses/api/* {
 		uri strip_prefix /dashboard/courses
 		reverse_proxy courses_hub_pi_automate:8000 {
 			transport http {
@@ -44,14 +42,15 @@ http://, http://courses.lan {
 	}
 
 	# 2. Patched course HTMLs and manifest.json
-	handle @module_courses {
+	handle /dashboard/courses/courses/* {
 		uri strip_prefix /dashboard/courses/courses
 		root * /srv/courses
 		header Cache-Control "no-cache, must-revalidate"
 		file_server
 	}
 
-	# 3. Dashboard index
+	# 3. Dashboard index (exact paths)
+	@module_root path /dashboard/courses /dashboard/courses/
 	handle @module_root {
 		root * /srv/frontend
 		rewrite * /index.html
@@ -60,7 +59,8 @@ http://, http://courses.lan {
 	}
 
 	# 4. Dashboard static assets (e.g. courses-sync.js)
-	handle @module_static {
+	# Catches anything under the module not matched by handlers above.
+	handle /dashboard/courses/* {
 		uri strip_prefix /dashboard/courses
 		root * /srv/frontend
 		header Cache-Control "no-cache, must-revalidate"
