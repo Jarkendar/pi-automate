@@ -17,7 +17,7 @@
 	}
 }
 
-courses.lan, http:// {
+http://courses.lan, http:// {
 	basicauth {
 		{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
 	}
