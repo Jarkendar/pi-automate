@@ -21,7 +21,7 @@
 (function (global) {
   "use strict";
 
-  const API_BASE = "/api/v1";
+  const API_BASE = "../api/v1";
   const DEBOUNCE_MS = 800;
   const SYNC_TIMEOUT_MS = 5000;
   const LS_DIRTY_FLAG = "_coursesSync_dirty_";

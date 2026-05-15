@@ -137,7 +137,7 @@
         <h1>Courses Hub</h1>
         <div class="sub">moduł <a href="https://github.com/Jarkendar/pi-automate" target="_blank">pi-automate</a></div>
       </div>
-      <a href="/api/v1/docs" style="font-size:13px; color: var(--text-secondary); text-decoration:none;">
+      <a href="api/v1/docs" style="font-size:13px; color: var(--text-secondary); text-decoration:none;">
         <i class="ti ti-code"></i> API
       </a>
     </header>
@@ -162,7 +162,7 @@
 
 async function loadManifest() {
   try {
-    const res = await fetch("/courses/manifest.json", { credentials: "include", cache: "no-store" });
+    const res = await fetch("manifest.json", { credentials: "include", cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     return await res.json();
   } catch (e) {
@@ -173,7 +173,7 @@ async function loadManifest() {
 
 async function fetchSummaries() {
   try {
-    const res = await fetch("/api/v1/courses", { credentials: "include", cache: "no-store" });
+    const res = await fetch("api/v1/courses", { credentials: "include", cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const arr = await res.json();
     const map = {};
@@ -242,7 +242,7 @@ function renderCourses(courses, summaries) {
     const s = summaries[course.id];
     if (course.noProgress) {
       return `
-        <a class="course" href="/courses/${course.file}">
+        <a class="course" href="courses/${course.file}">
           <div class="course-head">
             <h2 class="course-title">${course.title} <span class="badge">statyczny</span></h2>
             <div class="course-percent"><i class="ti ti-external-link"></i></div>
@@ -265,7 +265,7 @@ function renderCourses(courses, summaries) {
       : "—";
 
     return `
-      <a class="course" href="/courses/${course.file}">
+      <a class="course" href="courses/${course.file}">
         <div class="course-head">
           <h2 class="course-title">${course.title}</h2>
           <div class="course-percent ${done ? "done" : ""}">${Math.round(pct)}%</div>

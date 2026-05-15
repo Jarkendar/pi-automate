@@ -324,7 +324,7 @@ def build_bootstrap(info: DetectedCourse) -> str:
 
     return f"""
 {MARKER}
-<script src="/courses-sync.js"></script>
+<script src="../courses-sync.js"></script>
 {INDICATOR_HTML}
 <script>
 // Wait until both the adapter and the course's data are available.
@@ -392,46 +392,22 @@ def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def count_lessons_runtime(html: str) -> int:
+def count_lessons_static(html: str) -> int:
     """
-    Count lessons by evaluating the course's own data declaration in a
-    Node.js sandbox. This is the same code path the patched course uses at
-    runtime, so the manifest count is guaranteed to match what
-    `CoursesSync.attach({ lessonCount })` reports back to the API.
-
-    Strategy:
-      1. Extract the top-level `const COURSE = { ... };` or
-         `const COURSE_DATA = [ ... ];` block from the HTML.
-      2. Append a tiny epilogue that prints the lesson count.
-      3. Run with `node -e` and parse the integer.
-
-    Returns 0 if extraction or evaluation fails - the manifest will then
-    fall back to the API-supplied count once the course is opened.
+    Count lessons by structural inspection of the HTML source. Used only for
+    the manifest (best-effort upper bound). Runtime counts coming back from
+    each course via API are authoritative.
     """
-    import subprocess
-
-    pattern = r"(const\s+(COURSE_DATA|COURSE)\s*=\s*[\[\{][\s\S]*?^[\]\}];)"
-    m = re.search(pattern, html, re.MULTILINE)
-    if not m:
-        return 0
-
-    decl, var_name = m.group(1), m.group(2)
-    modules_ref = "COURSE.modules" if var_name == "COURSE" else "COURSE_DATA"
-    js = decl + (
-        f"\nconsole.log({modules_ref}"
-        f".reduce(function(s,m){{return s+(m.lessons?m.lessons.length:0);}},0));"
-    )
-
-    try:
-        res = subprocess.run(
-            ["node", "-e", js],
-            capture_output=True, text=True, timeout=5, check=False,
-        )
-        if res.returncode != 0:
-            return 0
-        return int(res.stdout.strip())
-    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError):
-        return 0
+    # Strategy: count `title:` occurrences inside lesson literals.
+    # A lesson literal is recognized by being adjacent to a `time:` field
+    # OR by being inside a `lessons: [` block.
+    # Heuristic: count occurrences of `title:` minus module-level titles.
+    titles = len(re.findall(r"\btitle\s*:\s*['\"]", html))
+    modules = len(re.findall(r"\blessons\s*:\s*\[", html))
+    # Each module has its own `title:` field, plus the top-level COURSE.title
+    # if present. Subtract those from total titles.
+    has_course_title = 1 if re.search(r"const\s+COURSE\s*=\s*\{[^}]*title\s*:", html, re.DOTALL) else 0
+    return max(titles - modules - has_course_title, 0)
 
 
 # ---------------------------------------------------------------------------
@@ -494,7 +470,7 @@ def main():
         info = detect_course(src_file, overrides)
         courses.append(info)
         html = src_file.read_text(encoding="utf-8", errors="replace")
-        counts[info.course_id] = count_lessons_runtime(html)
+        counts[info.course_id] = count_lessons_static(html)
         dst_file = args.dst / src_file.name
 
         if info.strategy is None:

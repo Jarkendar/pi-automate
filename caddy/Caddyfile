@@ -1,15 +1,15 @@
 # Courses Hub - reverse proxy, basic auth, static files
 #
-# Auth credentials are pulled from .env:
+# All routes live under /dashboard/courses/ so the root URL is free for
+# future modules. Anything outside the prefix returns 404.
+#
+# Auth credentials come from .env:
 #   COURSES_HUB_USER       - username (default "jarek")
 #   COURSES_HUB_PASS_HASH  - bcrypt hash (generate with `make courses-auth`)
-#
-# Bind to `courses.lan` and also serve on raw IP (no Host requirement).
-# For nice URL: add `<IP_RPi>  courses.lan` in your router's local DNS
-# (AdGuard/Pi-hole) or /etc/hosts on each device.
 
 {
 	admin off
+	auto_https off
 	log {
 		output stdout
 		format console
@@ -17,35 +17,50 @@
 	}
 }
 
-http://courses.lan, http:// {
-	basicauth {
-		{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
-	}
-
+http://, http://courses.lan {
 	encode zstd gzip
 
-	# API -> backend (resolved via Docker DNS in the n8n-network)
-	handle /api/* {
-		reverse_proxy courses_hub_pi_automate:8000 {
-			transport http {
-				dial_timeout 5s
-				response_header_timeout 15s
+	# Everything under the module prefix requires auth
+	@module path /dashboard/courses /dashboard/courses/*
+	handle @module {
+		basicauth {
+			{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
+		}
+
+		# API -> backend (resolved via Docker DNS in the n8n-network)
+		handle /dashboard/courses/api/* {
+			uri strip_prefix /dashboard/courses
+			reverse_proxy courses_hub_pi_automate:8000 {
+				transport http {
+					dial_timeout 5s
+					response_header_timeout 15s
+				}
 			}
 		}
+
+		# Patched course HTMLs (from ./courses_patched on the host)
+		handle /dashboard/courses/courses/* {
+			uri strip_prefix /dashboard/courses/courses
+			root * /srv/courses
+			header Cache-Control "no-cache, must-revalidate"
+			file_server
+		}
+
+		# Dashboard + adapter JS (from ./courses_hub_frontend on the host)
+		handle /dashboard/courses/* {
+			uri strip_prefix /dashboard/courses
+			root * /srv/frontend
+			try_files {path} /index.html
+			header Cache-Control "no-cache, must-revalidate"
+			file_server
+		}
+
+		# Trailing-slash redirect: /dashboard/courses -> /dashboard/courses/
+		redir /dashboard/courses /dashboard/courses/ 308
 	}
 
-	# Static course HTMLs (private, mounted from ./courses_patched)
-	handle_path /courses/* {
-		root * /srv/courses
-		header Cache-Control "no-cache, must-revalidate"
-		file_server
-	}
-
-	# Dashboard + adapter (mounted from ./courses_hub_frontend)
+	# Anything else: 404 (root is reserved for future modules)
 	handle {
-		root * /srv/frontend
-		try_files {path} /index.html
-		header Cache-Control "no-cache, must-revalidate"
-		file_server
+		respond 404
 	}
 }
