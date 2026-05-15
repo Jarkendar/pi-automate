@@ -1,12 +1,22 @@
 /**
  * Courses Hub Sync Adapter - pi-automate module.
  *
- * Drop-in replacement for localStorage usage in course HTML files.
- * Intercepts read/write and syncs with the Courses Hub API
- * (PUT /api/v1/courses/{course_id}).
+ * Single, uniform adapter. Each patched course provides callbacks that
+ * encapsulate its own localStorage format:
  *
- * Offline-first: reads come from localStorage, writes go there first and are
- * then debounced to the API. On page load the adapter pulls server state.
+ *   readLessons()  -> { [lessonId]: { status, notes } }
+ *   writeLessons({ [lessonId]: { status, notes } })  // restores into LS
+ *   lessonCount()  -> integer (authoritative total from the course's data)
+ *
+ * The adapter knows nothing about single-key/multi-key/hybrid storage shapes.
+ * All storage details live in the patcher-injected callbacks.
+ *
+ * Sync strategy:
+ *   - On page load: pull server state, merge via writeLessons() (server wins).
+ *   - On every localStorage mutation: re-read via readLessons(), compute a
+ *     stable hash; if it differs from the last pushed state, schedule a
+ *     debounced PUT.
+ *   - On tab hide: best-effort flush if dirty.
  */
 (function (global) {
   "use strict";
@@ -33,62 +43,6 @@
     return STATUS_IN[String(s).trim().toLowerCase()] || "not_started";
   }
 
-  // Strategy A: single JSON blob in one localStorage key
-  function singleKeyExtract(rawObj) {
-    const obj = rawObj || {};
-    const statuses = obj.statuses || obj.status || {};
-    const notes = obj.notes || {};
-    const meta = {};
-    for (const k of Object.keys(obj)) {
-      if (k !== "statuses" && k !== "status" && k !== "notes") meta[k] = obj[k];
-    }
-    const lessons = {};
-    for (const id of new Set([...Object.keys(statuses), ...Object.keys(notes)])) {
-      lessons[id] = {
-        status: normStatus(statuses[id]),
-        notes: notes[id] || "",
-      };
-    }
-    return { lessons, meta };
-  }
-
-  function singleKeyApply(rawObj, lessons, meta) {
-    const out = { ...(rawObj || {}) };
-    const statusKey = "statuses" in out ? "statuses" : ("status" in out ? "status" : "statuses");
-    out[statusKey] = {};
-    out.notes = {};
-    for (const [id, lp] of Object.entries(lessons)) {
-      out[statusKey][id] = lp.status;
-      if (lp.notes) out.notes[id] = lp.notes;
-    }
-    for (const [k, v] of Object.entries(meta || {})) out[k] = v;
-    return out;
-  }
-
-  // Strategy B: multiple keys, one per lesson
-  function multiKeyExtract(prefix, lessonIds) {
-    const lessons = {};
-    for (const id of lessonIds) {
-      const s = localStorage.getItem(prefix + "status_" + id);
-      const n = localStorage.getItem(prefix + "notes_" + id);
-      if (s || n) {
-        lessons[id] = { status: normStatus(s), notes: n || "" };
-      }
-    }
-    return { lessons, meta: {} };
-  }
-
-  function multiKeyApply(prefix, lessons) {
-    for (const [id, lp] of Object.entries(lessons)) {
-      localStorage.setItem(prefix + "status_" + id, lp.status);
-      if (lp.notes) {
-        localStorage.setItem(prefix + "notes_" + id, lp.notes);
-      } else {
-        localStorage.removeItem(prefix + "notes_" + id);
-      }
-    }
-  }
-
   async function apiRequest(method, path, body) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), SYNC_TIMEOUT_MS);
@@ -101,7 +55,7 @@
         signal: ctrl.signal,
       });
       if (!res.ok && res.status !== 404) {
-        throw new Error(`API ${method} ${path} -> HTTP ${res.status}`);
+        throw new Error("API " + method + " " + path + " -> HTTP " + res.status);
       }
       return res.status === 404 ? null : await res.json();
     } finally {
@@ -109,45 +63,69 @@
     }
   }
 
+  function normalizeLessons(raw) {
+    const out = {};
+    for (const [id, lp] of Object.entries(raw || {})) {
+      out[id] = {
+        status: normStatus(lp && lp.status),
+        notes: (lp && lp.notes) || "",
+      };
+    }
+    return out;
+  }
+
+  // Stable hash of lessons map for change detection
+  function hashLessons(lessons) {
+    const keys = Object.keys(lessons).sort();
+    return keys.map(k => k + ":" + lessons[k].status + ":" + lessons[k].notes.length).join("|");
+  }
+
+  // Install global LS hook exactly once. Each attach() registers a listener
+  // that gets called after every setItem/removeItem.
+  const listeners = [];
+  let hookInstalled = false;
+  function installLSHook() {
+    if (hookInstalled) return;
+    hookInstalled = true;
+    const origSet = Storage.prototype.setItem;
+    const origRemove = Storage.prototype.removeItem;
+    Storage.prototype.setItem = function (k, v) {
+      origSet.call(this, k, v);
+      if (this === localStorage) {
+        for (const fn of listeners) {
+          try { fn(); } catch (e) { console.error("[CoursesSync] listener err:", e); }
+        }
+      }
+    };
+    Storage.prototype.removeItem = function (k) {
+      origRemove.call(this, k);
+      if (this === localStorage) {
+        for (const fn of listeners) {
+          try { fn(); } catch (e) { console.error("[CoursesSync] listener err:", e); }
+        }
+      }
+    };
+  }
+
   function attach(config) {
     const {
       courseId,
       title = "",
-      singleKey = null,
-      multiKey = null,
-      totalLessons = 0,
+      readLessons,
+      writeLessons,
+      lessonCount,
       onSync = null,
     } = config;
 
     if (!courseId) throw new Error("CoursesSync.attach: courseId is required");
-    if (!singleKey && !multiKey) throw new Error("CoursesSync.attach: singleKey or multiKey required");
+    if (typeof readLessons !== "function" || typeof writeLessons !== "function") {
+      throw new Error("CoursesSync.attach: readLessons / writeLessons are required");
+    }
 
     let pending = null;
     let inFlight = false;
-
-    function readLocal() {
-      if (singleKey) {
-        const raw = localStorage.getItem(singleKey);
-        try {
-          return singleKeyExtract(raw ? JSON.parse(raw) : {});
-        } catch {
-          return { lessons: {}, meta: {} };
-        }
-      }
-      return multiKeyExtract(multiKey.prefix, multiKey.lessonIds);
-    }
-
-    function writeLocal(lessons, meta) {
-      if (singleKey) {
-        const raw = localStorage.getItem(singleKey);
-        let prev = {};
-        try { prev = raw ? JSON.parse(raw) : {}; } catch { prev = {}; }
-        const merged = singleKeyApply(prev, lessons, meta);
-        localStorage.setItem(singleKey, JSON.stringify(merged));
-      } else {
-        multiKeyApply(multiKey.prefix, lessons);
-      }
-    }
+    let lastPushedHash = null;
+    let suppressHook = false; // true while we apply remote state to avoid push loop
 
     function setStatusUI(s) {
       try { onSync && onSync(s); } catch { /* ignore */ }
@@ -159,19 +137,21 @@
       inFlight = true;
       setStatusUI({ state: "syncing" });
       try {
-        const { lessons, meta } = readLocal();
+        const lessons = normalizeLessons(readLessons());
+        const total = typeof lessonCount === "function" ? lessonCount() : 0;
         const payload = {
           course_id: courseId,
           title,
-          total_lessons: totalLessons,
+          total_lessons: total,
           lessons,
-          meta,
+          meta: {},
         };
         await apiRequest("PUT", "/courses/" + encodeURIComponent(courseId), payload);
+        lastPushedHash = hashLessons(lessons);
         localStorage.removeItem(LS_DIRTY_FLAG + courseId);
         setStatusUI({ state: "synced", at: new Date().toISOString() });
       } catch (err) {
-        console.warn("[CoursesSync] push failed, keeping dirty flag:", err);
+        console.warn("[CoursesSync] push failed:", err);
         localStorage.setItem(LS_DIRTY_FLAG + courseId, "1");
         setStatusUI({ state: "error", error: String(err) });
       } finally {
@@ -184,18 +164,34 @@
       pending = setTimeout(push, DEBOUNCE_MS);
     }
 
+    function onStorageChange() {
+      if (suppressHook) return;
+      const lessons = normalizeLessons(readLessons());
+      const h = hashLessons(lessons);
+      if (h !== lastPushedHash) schedulePush();
+    }
+
     async function pull() {
       try {
         const remote = await apiRequest("GET", "/courses/" + encodeURIComponent(courseId));
-        if (!remote || !remote.lessons) {
-          if (Object.keys(readLocal().lessons).length > 0) await push();
+        if (!remote || !remote.lessons || Object.keys(remote.lessons).length === 0) {
+          // Server has no data yet - seed from local if local has anything
+          const localLessons = normalizeLessons(readLessons());
+          if (Object.keys(localLessons).length > 0) {
+            await push();
+          } else {
+            lastPushedHash = hashLessons({});
+          }
           return;
         }
-        const lessons = {};
-        for (const [id, lp] of Object.entries(remote.lessons)) {
-          lessons[id] = { status: normStatus(lp.status), notes: lp.notes || "" };
+        const lessons = normalizeLessons(remote.lessons);
+        suppressHook = true;
+        try {
+          writeLessons(lessons);
+        } finally {
+          suppressHook = false;
         }
-        writeLocal(lessons, remote.meta || {});
+        lastPushedHash = hashLessons(lessons);
         localStorage.setItem(LS_LAST_PULL + courseId, new Date().toISOString());
         setStatusUI({ state: "pulled", at: new Date().toISOString() });
       } catch (err) {
@@ -204,28 +200,21 @@
       }
     }
 
-    const origSetItem = Storage.prototype.setItem;
-    const origRemoveItem = Storage.prototype.removeItem;
-    const keysOfInterest = singleKey
-      ? (k) => k === singleKey
-      : (k) => k.startsWith(multiKey.prefix);
+    installLSHook();
+    listeners.push(onStorageChange);
 
-    Storage.prototype.setItem = function (k, v) {
-      origSetItem.call(this, k, v);
-      if (this === localStorage && keysOfInterest(k)) schedulePush();
-    };
-    Storage.prototype.removeItem = function (k) {
-      origRemoveItem.call(this, k);
-      if (this === localStorage && keysOfInterest(k)) schedulePush();
-    };
+    // Best-effort flush on tab hide
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden" &&
+          localStorage.getItem(LS_DIRTY_FLAG + courseId)) {
+        push();
+      }
+    });
 
+    // Initial sync
     pull();
 
-    return {
-      pushNow: push,
-      pullNow: pull,
-      readLocal,
-    };
+    return { pushNow: push, pullNow: pull };
   }
 
   global.CoursesSync = { attach, normStatus };
