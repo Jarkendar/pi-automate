@@ -162,7 +162,7 @@
 
 async function loadManifest() {
   try {
-    const res = await fetch("manifest.json", { credentials: "include", cache: "no-store" });
+    const res = await fetch("courses/manifest.json", { credentials: "include", cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     return await res.json();
   } catch (e) {

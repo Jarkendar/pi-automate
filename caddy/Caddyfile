@@ -5,7 +5,7 @@
 #
 # Auth credentials come from .env:
 #   COURSES_HUB_USER       - username (default "jarek")
-#   COURSES_HUB_PASS_HASH  - bcrypt hash (generate with `make courses-auth`)
+#   COURSES_HUB_PASS_HASH  - bcrypt hash (generate with scripts/courses-setup-auth.sh)
 
 {
 	admin off
@@ -20,43 +20,51 @@
 http://, http://courses.lan {
 	encode zstd gzip
 
-	# Everything under the module prefix requires auth
-	@module path /dashboard/courses /dashboard/courses/*
-	handle @module {
-		basicauth {
-			{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
-		}
+	# Named matchers
+	@module_api      path /dashboard/courses/api/*
+	@module_courses  path /dashboard/courses/courses/*
+	@module_root     path /dashboard/courses /dashboard/courses/
+	@module_static   path_regexp moduleStatic ^/dashboard/courses/(?!api/|courses/).+$
 
-		# API -> backend (resolved via Docker DNS in the n8n-network)
-		handle /dashboard/courses/api/* {
-			uri strip_prefix /dashboard/courses
-			reverse_proxy courses_hub_pi_automate:8000 {
-				transport http {
-					dial_timeout 5s
-					response_header_timeout 15s
-				}
+	# Basic auth for the whole module
+	@module path /dashboard/courses /dashboard/courses/*
+	basicauth @module {
+		{$COURSES_HUB_USER:jarek} {$COURSES_HUB_PASS_HASH}
+	}
+
+	# 1. API -> backend
+	handle @module_api {
+		uri strip_prefix /dashboard/courses
+		reverse_proxy courses_hub_pi_automate:8000 {
+			transport http {
+				dial_timeout 5s
+				response_header_timeout 15s
 			}
 		}
+	}
 
-		# Patched course HTMLs (from ./courses_patched on the host)
-		handle /dashboard/courses/courses/* {
-			uri strip_prefix /dashboard/courses/courses
-			root * /srv/courses
-			header Cache-Control "no-cache, must-revalidate"
-			file_server
-		}
+	# 2. Patched course HTMLs and manifest.json
+	handle @module_courses {
+		uri strip_prefix /dashboard/courses/courses
+		root * /srv/courses
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
+	}
 
-		# Dashboard + adapter JS (from ./courses_hub_frontend on the host)
-		handle /dashboard/courses/* {
-			uri strip_prefix /dashboard/courses
-			root * /srv/frontend
-			try_files {path} /index.html
-			header Cache-Control "no-cache, must-revalidate"
-			file_server
-		}
+	# 3. Dashboard index
+	handle @module_root {
+		root * /srv/frontend
+		rewrite * /index.html
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
+	}
 
-		# Trailing-slash redirect: /dashboard/courses -> /dashboard/courses/
-		redir /dashboard/courses /dashboard/courses/ 308
+	# 4. Dashboard static assets (e.g. courses-sync.js)
+	handle @module_static {
+		uri strip_prefix /dashboard/courses
+		root * /srv/frontend
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
 	}
 
 	# Anything else: 404 (root is reserved for future modules)
