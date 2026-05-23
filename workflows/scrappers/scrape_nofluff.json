@@ -1,0 +1,91 @@
+{
+  "name": "scrape_nofluff",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "max_pages",
+              "type": "number"
+            },
+            {
+              "name": "config",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "74baaca4-de06-41ef-bbc0-73b83b5e90a1",
+      "name": "Start flow with data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// =============================================================================\n// NoFluffJobs Scraper — n8n Code Node (JavaScript)\n// Metoda: HTML scraping + Angular SSR transfer-state JSON\n// Interfejs: executeWorkflowTrigger → { max_pages?, config? }\n// =============================================================================\n\nconst DEFAULT_CONFIG = {\n  region:   \"pl\",\n  maxPages: null,\n  delayMs:  800,    // większy delay dla HTML scraping\n  criteria: null,   // np. \"backend\" | \"mobile\" — doklejane do URL\n};\n\n// ── Helpers ──────────────────────────────────────────────────────────────────\nfunction sleep(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nfunction normalizeSeniority(levels) {\n  if (!levels || levels.length === 0) return null;\n  const priority = [\"expert\", \"lead\", \"manager\", \"senior\", \"mid\", \"junior\"];\n  for (const p of priority) {\n    if (levels.map(l => l.toLowerCase()).includes(p)) return p;\n  }\n  return levels[0]?.toLowerCase() ?? null;\n}\n\nfunction parseLocation(raw) {\n  // NFJ: raw.location = { places: [...], fullyRemote: bool, hybridDesc: string }\n  const loc        = raw.location ?? {};\n  const places     = loc.places ?? [];\n  const fullyRemote = loc.fullyRemote ?? false;\n  const hybridDesc  = (loc.hybridDesc ?? \"\").trim();\n\n  let remote_type;\n  if (fullyRemote)      remote_type = \"remote\";\n  else if (hybridDesc)  remote_type = \"hybrid\";\n  else                  remote_type = \"office\";\n\n  const cities = places\n    .filter(p => p.city && p.city !== \"Remote\")\n    .map(p => p.city);\n\n  let location;\n  if (fullyRemote && cities.length === 0) location = \"Remote\";\n  else if (cities.length > 0)             location = [...new Set(cities)].join(\" / \");\n  else                                    location  = null;\n\n  return { location, remote_type };\n}\n\nfunction parseSalary(sal) {\n  // NFJ: salary = { from?, to?, type, currency, disclosedAt, flexibleUpperBound }\n  if (!sal || typeof sal !== \"object\") {\n    return { salary_min: null, salary_max: null, salary_currency: null, salary_type: null };\n  }\n  return {\n    salary_min:      sal.from     ?? null,\n    salary_max:      sal.to       ?? null,\n    salary_currency: sal.currency ?? null,\n    salary_type:     sal.type?.toLowerCase() ?? null,\n  };\n}\n\nfunction mapPosting(raw) {\n  const { location, remote_type } = parseLocation(raw);\n  const { salary_min, salary_max, salary_currency, salary_type } = parseSalary(raw.salary);\n\n  // Tech stack: tiles.values[type===\"requirement\"] + raw.technology jako fallback\n  const tileReqs = (raw.tiles?.values ?? [])\n    .filter(t => t.type === \"requirement\")\n    .map(t => t.value)\n    .filter(Boolean);\n  const techStack = raw.technology && !tileReqs.includes(raw.technology)\n    ? [raw.technology, ...tileReqs]\n    : tileReqs;\n\n  const externalId = raw.id ?? null;\n  const url        = externalId ? `https://nofluffjobs.com/pl/job/${externalId}` : null;\n  const postedAt   = raw.posted  ? new Date(raw.posted).toISOString()  : null;\n  const validUntil = raw.renewed ? new Date(raw.renewed).toISOString() : null;\n\n  return {\n    source:         \"nofluffjobs\",\n    external_id:    externalId,\n    url,\n    title:          raw.title ?? null,\n    company:        raw.name  ?? null,\n    location,\n    remote_type,\n    salary_min,\n    salary_max,\n    salary_currency,\n    salary_type,\n    tech_stack:     techStack,\n    seniority:      normalizeSeniority(raw.seniority),\n    posted_at:      postedAt,\n    valid_until:    validUntil,\n    basic_payload:  raw,\n  };\n}\n\n// ── Ekstrakcja danych z HTML ──────────────────────────────────────────────────\nfunction extractFromHtml(html) {\n  // Strategia 1: Angular SSR transfer state\n  // <script id=\"serverApp-state\" type=\"application/json\">...</script>\n  // Regex agnostyczny na kolejność atrybutów\n  const ssrMatch = html.match(\n    /<script\\b[^>]*\\bid=[\"']serverApp-state[\"'][^>]*>([\\s\\S]*?)<\\/script>/i\n  );\n\n  if (ssrMatch) {\n    try {\n      const raw = ssrMatch[1]\n        .replace(/&lt;/g, \"<\")\n        .replace(/&gt;/g, \">\")\n        .replace(/&amp;/g, \"&\")\n        .replace(/&quot;/g, \"\\\"\")\n        .replace(/&#39;/g, \"'\");\n\n      const state = JSON.parse(raw);\n\n      // Przeszukaj płytko i głęboko cały state szukając tablicy postings\n      function findPostings(obj, depth = 0) {\n        if (!obj || typeof obj !== \"object\" || depth > 5) return null;\n        // bezpośrednie pola\n        if (Array.isArray(obj.postings) && obj.postings.length > 0)\n          return { postings: obj.postings, totalPages: obj.totalPages ?? null, totalCount: obj.totalCount ?? null };\n        if (Array.isArray(obj.items) && obj.items.length > 0)\n          return { postings: obj.items, totalPages: obj.totalPages ?? null, totalCount: obj.totalCount ?? null };\n        // zagłębione (Angular HttpClient cache: { body: {...} })\n        for (const val of Object.values(obj)) {\n          const found = findPostings(val, depth + 1);\n          if (found) return found;\n        }\n        return null;\n      }\n\n      const found = findPostings(state);\n      if (found) return found;\n    } catch (e) {\n      // fall through do strategii 2\n    }\n  }\n\n  // Strategia 2: window.__TRANSFER_STATE__ lub window.INITIAL_STATE lub podobne\n  const windowStateMatch = html.match(\n    /window\\.__(?:TRANSFER_STATE|INITIAL_STATE|APP_STATE|NFJ_STATE)__\\s*=\\s*(\\{[\\s\\S]*?\\});\\s*<\\/script>/i\n  );\n  if (windowStateMatch) {\n    try {\n      const state = JSON.parse(windowStateMatch[1]);\n      const postings = state.postings ?? state.items ?? state.jobs ?? null;\n      if (postings && Array.isArray(postings)) {\n        return { postings, totalPages: state.totalPages ?? null, totalCount: state.totalCount ?? null };\n      }\n    } catch (e) { /* fall through */ }\n  }\n\n  // Strategia 3: JSON-LD JobPosting schema\n  const jsonLdMatches = [...html.matchAll(\n    /<script[^>]+type=[\"']application\\/ld\\+json[\"'][^>]*>([\\s\\S]*?)<\\/script>/gi\n  )];\n  const jobs = [];\n  for (const m of jsonLdMatches) {\n    try {\n      const obj = JSON.parse(m[1]);\n      const items = Array.isArray(obj) ? obj : [obj];\n      for (const item of items) {\n        if (item[\"@type\"] === \"JobPosting\") jobs.push(item);\n      }\n    } catch (e) { /* skip */ }\n  }\n  if (jobs.length > 0) {\n    return { postings: jobs, totalPages: null, totalCount: null, isJsonLd: true };\n  }\n\n  return null;\n}\n\n// Konwersja JSON-LD JobPosting → wspólny kontrakt (fallback)\nfunction mapJsonLdPosting(raw) {\n  const salary    = raw.baseSalary?.value ?? {};\n  const url       = raw.url ?? null;\n  const externalId = url ? url.split(\"/\").pop() : null;\n\n  return {\n    source:         \"nofluffjobs\",\n    external_id:    externalId,\n    url,\n    title:          raw.title ?? null,\n    company:        raw.hiringOrganization?.name ?? null,\n    location:       raw.jobLocation?.address?.addressLocality ?? null,\n    remote_type:    raw.jobLocationType === \"TELECOMMUTE\" ? \"remote\" : \"office\",\n    salary_min:     salary.minValue ?? null,\n    salary_max:     salary.maxValue ?? null,\n    salary_currency: raw.baseSalary?.currency ?? null,\n    salary_type:    null,\n    tech_stack:     [],\n    seniority:      null,\n    posted_at:      raw.datePosted ?? null,\n    valid_until:    raw.validThrough ?? null,\n    basic_payload:  raw,\n  };\n}\n\n// ── Główna logika ─────────────────────────────────────────────────────────────\nasync function scrapeNoFluffJobs(cfg) {\n  const results = [];\n  let page = 1;\n  let totalPages = null;\n\n  const HEADERS = {\n    \"Accept\":          \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"pl-PL,pl;q=0.9,en-US;q=0.8\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"User-Agent\":      \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\",\n    \"Cache-Control\":   \"no-cache\",\n  };\n\n  while (true) {\n    if (cfg.maxPages !== null && page > cfg.maxPages) break;\n\n    // URL: https://nofluffjobs.com/pl[/criteria]?page=N\n    let pageUrl = `https://nofluffjobs.com/${cfg.region}`;\n    if (cfg.criteria) pageUrl += `/${cfg.criteria}`;\n    if (page > 1) pageUrl += `?page=${page}`;\n\n    let html;\n    try {\n      html = await this.helpers.httpRequest({\n        method:  \"GET\",\n        url:     pageUrl,\n        headers: HEADERS,\n        json:    false,\n      });\n    } catch (err) {\n      throw new Error(`NFJ fetch error (page ${page}, url: ${pageUrl}): ${err.message}`);\n    }\n\n    if (typeof html !== \"string\") {\n      html = JSON.stringify(html);\n    }\n\n    const extracted = extractFromHtml(html);\n\n    if (!extracted || extracted.postings.length === 0) {\n      if (page === 1) {\n        const ssrRawMatch = html.match(/<script\\b[^>]*\\bid=[\"']serverApp-state[\"'][^>]*>([\\s\\S]*?)<\\/script>/i);\n        const ssrRaw = ssrRawMatch ? ssrRawMatch[1].substring(0, 2000) : null;\n        return [{\n          json: {\n            _debug:             true,\n            html_length:        html.length,\n            has_state_script:   html.includes(\"serverApp-state\"),\n            state_script_raw:   ssrRaw,       // surowa zawartość — co tu siedzi?\n            html_end_2k:        html.substring(Math.max(0, html.length - 2000)),\n          }\n        }];\n      }\n      break;\n    }\n\n    if (totalPages === null) {\n      totalPages = extracted.totalPages\n        ?? (extracted.totalCount ? Math.ceil(extracted.totalCount / 20) : page + 1);\n    }\n\n    for (const raw of extracted.postings) {\n      const mapped = extracted.isJsonLd ? mapJsonLdPosting(raw) : mapPosting(raw);\n      results.push({ json: mapped });\n    }\n\n    if (page >= (totalPages ?? page)) break;\n\n    page++;\n    if (cfg.delayMs > 0) await sleep(cfg.delayMs);\n  }\n\n  return results;\n}\n\n// ── Wejście n8n ───────────────────────────────────────────────────────────────\nconst trigger  = $input.first().json ?? {};\nconst userConf = trigger.config ?? {};\nconst maxPages = trigger.max_pages ?? userConf.maxPages ?? DEFAULT_CONFIG.maxPages;\n\nconst cfg = { ...DEFAULT_CONFIG, ...userConf, maxPages };\n\nreturn await scrapeNoFluffJobs.call(this, cfg);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "ffc897eb-9dc2-4c1a-a026-029d4c975d65",
+      "name": "Scrape Offers"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start flow with data": {
+      "main": [
+        [
+          {
+            "node": "Scrape Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Offers": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bc0451ba-7bf2-46f2-a29d-cc6ff1fabd74",
+  "meta": {
+    "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
+  },
+  "id": "YatNJGC51gOC3bSc",
+  "tags": [
+    {
+      "name": "job-scout",
+      "id": "1Zv2NZKs8qaXM368",
+      "updatedAt": "2026-05-23T11:42:24.098Z",
+      "createdAt": "2026-05-23T11:42:24.098Z"
+    },
+    {
+      "name": "module",
+      "id": "XNxae8FnyCNr8ehu",
+      "updatedAt": "2026-05-23T11:42:24.091Z",
+      "createdAt": "2026-05-23T11:42:24.091Z"
+    },
+    {
+      "name": "nofluffjobs",
+      "id": "cN4kcbwT9YcgpiKX",
+      "updatedAt": "2026-05-23T11:43:12.180Z",
+      "createdAt": "2026-05-23T11:43:12.180Z"
+    }
+  ]
+}
