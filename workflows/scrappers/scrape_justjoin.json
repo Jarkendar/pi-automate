@@ -1,0 +1,91 @@
+{
+  "name": "scrape_justjoin",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "max_pages",
+              "type": "number"
+            },
+            {
+              "name": "config",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "be35c060-9a88-47d2-9b73-d76dbdab4f3d",
+      "name": "Start flow with data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// =============================================================================\n// JustJoin.it Scraper — n8n Code Node (JavaScript)\n// Metoda: HTML scraping + Next.js App Router RSC chunks (self.__next_f)\n// Interfejs: executeWorkflowTrigger → { max_pages?, config? }\n// =============================================================================\n\nconst DEFAULT_CONFIG = {\n  maxPages: null,\n  delayMs:  1200,\n  category: null,   // np. \"javascript\" | \"backend\" | \"mobile\" | \"devops\"\n  location: null,   // np. \"warszawa\" | \"remote\" | \"krakow\" | \"all-locations\"\n};\n\n// ── Helpers ──────────────────────────────────────────────────────────────────\nfunction sleep(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nfunction normalizeSeniority(level) {\n  if (!level) return null;\n  const map = {\n    expert:   \"expert\",\n    lead:     \"lead\",\n    senior:   \"senior\",\n    mid:      \"mid\",\n    regular:  \"mid\",\n    junior:   \"junior\",\n    trainee:  \"junior\",\n    intern:   \"junior\",\n    c_level:  \"c_level\",\n    manager:  \"lead\",\n  };\n  return map[level.toLowerCase()] ?? level.toLowerCase();\n}\n\nfunction parseWorkplaceType(raw) {\n  if (!raw) return \"office\";\n  const t = raw.toLowerCase().replace(/[-_]/g, \"\");\n  if ([\"remote\", \"fullyremote\", \"online\"].includes(t))    return \"remote\";\n  if ([\"hybrid\", \"partiallyremote\", \"mixed\"].includes(t)) return \"hybrid\";\n  return \"office\";\n}\n\n// JJit employmentTypes: płaska tablica { from, to, currency, currencySource, type, unit }\n// Priorytet waluty:  original (PLN/USD/EUR jako źródło) > conversion\n// Priorytet typu:   permanent z kwotami → b2b z kwotami → dowolny z kwotami → pierwszy\nfunction parseSalary(raw) {\n  const types = raw.employmentTypes ?? raw.employment_types ?? [];\n  if (types.length === 0) {\n    return {\n      salary_min:      raw.salary_from ?? raw.salaryFrom ?? null,\n      salary_max:      raw.salary_to   ?? raw.salaryTo   ?? null,\n      salary_currency: raw.currency    ?? null,\n      salary_type:     null,\n    };\n  }\n\n  // Filtruj do oryginalnej waluty (nie przeliczane) — żeby pokazać PLN, nie USD-converted\n  const originals  = types.filter(e => e.currencySource === \"original\");\n  const pool       = originals.length > 0 ? originals : types;\n\n  const hasAmt = (e) => e.from != null || e.to != null;\n\n  const preferred =\n    pool.find(e => e.type === \"permanent\" && hasAmt(e)) ??\n    pool.find(e => e.type === \"b2b\"       && hasAmt(e)) ??\n    pool.find(e => hasAmt(e))                           ??\n    pool[0];\n\n  return {\n    salary_min:      preferred.from     ?? preferred.fromPerUnit ?? null,\n    salary_max:      preferred.to       ?? preferred.toPerUnit   ?? null,\n    salary_currency: preferred.currency ?? null,\n    salary_type:     preferred.type?.toLowerCase() ?? null,\n  };\n}\n\nfunction mapPosting(raw) {\n  const externalId = raw.slug ?? raw.id ?? null;\n  const url        = externalId ? `https://justjoin.it/offers/${externalId}` : null;\n\n  const city       = raw.city ?? null;\n  const remoteType = parseWorkplaceType(raw.workplaceType ?? raw.workplace_type);\n  let location;\n  if (remoteType === \"remote\" && !city) location = \"Remote\";\n  else if (city)                        location = city;\n  else                                  location = null;\n\n  const { salary_min, salary_max, salary_currency, salary_type } = parseSalary(raw);\n\n  const skills    = raw.requiredSkills ?? raw.required_skills ?? raw.skills ?? [];\n  const techStack = skills\n    .map(s => (typeof s === \"string\" ? s : (s.name ?? s.skill ?? null)))\n    .filter(Boolean);\n\n  const seniority  = normalizeSeniority(raw.experienceLevel ?? raw.experience_level ?? raw.seniority ?? null);\n\n  // JJit używa publishedAt + expiredAt (nie offer_validity)\n  const postedAt   = raw.publishedAt    ?? raw.published_at   ?? null;\n  const validUntil = raw.expiredAt      ?? raw.expired_at\n                  ?? raw.offer_validity ?? raw.offerValidity   ?? null;\n\n  return {\n    source:          \"justjoin\",\n    external_id:     externalId,\n    url,\n    title:           raw.title       ?? null,\n    company:         raw.companyName ?? raw.company_name ?? raw.company?.name ?? null,\n    location,\n    remote_type:     remoteType,\n    salary_min,\n    salary_max,\n    salary_currency,\n    salary_type,\n    tech_stack:      techStack,\n    seniority,\n    posted_at:       postedAt   ? new Date(postedAt).toISOString()   : null,\n    valid_until:     validUntil ? new Date(validUntil).toISOString() : null,\n    basic_payload:   raw,\n  };\n}\n\nfunction mapJsonLdPosting(raw) {\n  const url        = raw.url ?? null;\n  const externalId = url ? url.split(\"/\").filter(Boolean).pop() : null;\n  const salary     = raw.baseSalary?.value ?? {};\n  return {\n    source:          \"justjoin\",\n    external_id:     externalId,\n    url,\n    title:           raw.title                                ?? null,\n    company:         raw.hiringOrganization?.name             ?? null,\n    location:        raw.jobLocation?.address?.addressLocality ?? null,\n    remote_type:     raw.jobLocationType === \"TELECOMMUTE\" ? \"remote\" : \"office\",\n    salary_min:      salary.minValue  ?? null,\n    salary_max:      salary.maxValue  ?? null,\n    salary_currency: raw.baseSalary?.currency ?? null,\n    salary_type:     null,\n    tech_stack:      [],\n    seniority:       null,\n    posted_at:       raw.datePosted   ?? null,\n    valid_until:     raw.validThrough ?? null,\n    basic_payload:   raw,\n  };\n}\n\n// ── Rekurencyjny finder ofert ─────────────────────────────────────────────────\nfunction findInObject(obj, depth = 0) {\n  if (!obj || typeof obj !== \"object\" || depth > 8) return null;\n  for (const key of [\"offers\", \"jobs\", \"jobOffers\", \"postings\", \"items\", \"results\", \"data\"]) {\n    if (Array.isArray(obj[key]) && obj[key].length > 0) {\n      return {\n        offers:     obj[key],\n        totalCount: obj.totalCount  ?? obj.total_count ?? obj.count ?? obj.totalItems ?? null,\n        totalPages: obj.totalPages  ?? obj.total_pages ?? null,\n        pageSize:   obj.pageSize    ?? obj.per_page    ?? null,\n      };\n    }\n  }\n  for (const val of Object.values(obj)) {\n    const found = findInObject(val, depth + 1);\n    if (found) return found;\n  }\n  return null;\n}\n\n// ── Ekstrakcja danych z HTML ──────────────────────────────────────────────────\nfunction extractFromHtml(html) {\n  // Strategia 1: Next.js Pages Router — __NEXT_DATA__ (legacy)\n  const nextDataMatch = html.match(\n    /<script\\b[^>]*\\bid=[\"']__NEXT_DATA__[\"'][^>]*>([\\s\\S]*?)<\\/script>/i\n  );\n  if (nextDataMatch) {\n    try {\n      const state = JSON.parse(nextDataMatch[1]);\n      const found = findInObject(state);\n      if (found) return found;\n    } catch (e) { /* fall through */ }\n  }\n\n  // Strategia 2: Next.js App Router — self.__next_f RSC chunks\n  // Każdy push = oddzielny <script>; linia RSC: \"rowHexId:{ json }\"\n  const scriptContents = [...html.matchAll(/<script[^>]*>([\\s\\S]*?)<\\/script>/gi)]\n    .map(m => m[1].trim())\n    .filter(c => c.includes(\"__next_f\"));\n\n  for (const chunk of scriptContents) {\n    const pushMatch = chunk.match(/push\\(\\[\\d+,\"([\\s\\S]*)\"\\]\\)\\s*$/);\n    if (!pushMatch) continue;\n\n    const line = pushMatch[1]\n      .replace(/\\\\\"/g,  '\"')\n      .replace(/\\\\\\\\/g, \"\\\\\")\n      .replace(/\\\\n/g,  \"\\n\")\n      .replace(/\\\\r/g,  \"\");\n\n    const colonMatch = line.match(/^[0-9a-f]+:(\\{[\\s\\S]*|\\[[\\s\\S]*)$/);\n    if (!colonMatch) continue;\n\n    try {\n      const obj   = JSON.parse(colonMatch[1]);\n      const found = findInObject(obj);\n      if (found) return found;\n    } catch (e) { /* chunk nie zawierał ofert */ }\n  }\n\n  // Strategia 3: JSON-LD JobPosting (last resort)\n  const jsonLdMatches = [...html.matchAll(\n    /<script[^>]+type=[\"']application\\/ld\\+json[\"'][^>]*>([\\s\\S]*?)<\\/script>/gi\n  )];\n  const jobs = [];\n  for (const m of jsonLdMatches) {\n    try {\n      const obj   = JSON.parse(m[1]);\n      const items = Array.isArray(obj) ? obj : [obj];\n      for (const item of items) if (item[\"@type\"] === \"JobPosting\") jobs.push(item);\n    } catch (e) { /* skip */ }\n  }\n  if (jobs.length > 0) {\n    return { offers: jobs, totalCount: null, totalPages: null, pageSize: null, isJsonLd: true };\n  }\n\n  return null;\n}\n\n// ── Debug payload ─────────────────────────────────────────────────────────────\nfunction buildDebugPayload(html) {\n  const ndMatch  = html.match(/<script\\b[^>]*\\bid=[\"']__NEXT_DATA__[\"'][^>]*>([\\s\\S]*?)<\\/script>/i);\n  const rscChunks = [...html.matchAll(/<script[^>]*>([\\s\\S]*?)<\\/script>/gi)]\n    .map(m => m[1].trim())\n    .filter(c => c.includes(\"__next_f\"));\n\n  let rscSample = null;\n  for (const c of rscChunks) {\n    const pm = c.match(/push\\(\\[\\d+,\"([\\s\\S]*)\"\\]\\)\\s*$/);\n    if (pm && pm[1].length > 10) { rscSample = pm[1].substring(0, 600); break; }\n  }\n\n  const scriptIds = [...html.matchAll(/<script[^>]+id=[\"']([^\"']+)[\"'][^>]*>/gi)].map(m => m[1]);\n\n  return {\n    html_length:         html.length,\n    has_next_data:       !!ndMatch,\n    rsc_chunk_count:     rscChunks.length,\n    rsc_first_sample:    rscSample,\n    script_ids:          scriptIds,\n    html_start_2k:       html.substring(0, 2000),\n    html_end_2k:         html.substring(Math.max(0, html.length - 2000)),\n  };\n}\n\n// ── URL builder ───────────────────────────────────────────────────────────────\nfunction buildUrl(cfg, page) {\n  let base = \"https://justjoin.it\";\n  if (cfg.location || cfg.category) {\n    const loc = cfg.location ?? \"all-locations\";\n    base += cfg.category ? `/job-offers/${loc}/${cfg.category}` : `/job-offers/${loc}`;\n  }\n  return page > 1 ? `${base}?page=${page}` : base;\n}\n\n// ── Główna logika ─────────────────────────────────────────────────────────────\nasync function scrapeJustJoin(cfg) {\n  const results  = [];\n  let page       = 1;\n  let totalPages = null;\n\n  const HEADERS = {\n    \"Accept\":          \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"pl-PL,pl;q=0.9,en-US;q=0.8\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"User-Agent\":      \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\",\n    \"Cache-Control\":   \"no-cache\",\n  };\n\n  while (true) {\n    if (cfg.maxPages !== null && page > cfg.maxPages) break;\n\n    const pageUrl = buildUrl(cfg, page);\n    let html;\n    try {\n      html = await this.helpers.httpRequest({\n        method:  \"GET\",\n        url:     pageUrl,\n        headers: HEADERS,\n        json:    false,\n      });\n    } catch (err) {\n      throw new Error(`JJit fetch error (page ${page}, url: ${pageUrl}): ${err.message}`);\n    }\n\n    if (typeof html !== \"string\") html = JSON.stringify(html);\n\n    const extracted = extractFromHtml(html);\n\n    if (!extracted || extracted.offers.length === 0) {\n      if (page === 1) return [{ json: buildDebugPayload(html) }];\n      break;\n    }\n\n    if (totalPages === null) {\n      const pageSize = extracted.pageSize ?? extracted.offers.length;\n      totalPages = extracted.totalPages\n        ?? (extracted.totalCount ? Math.ceil(extracted.totalCount / pageSize) : page + 1);\n    }\n\n    for (const raw of extracted.offers) {\n      const mapped = extracted.isJsonLd ? mapJsonLdPosting(raw) : mapPosting(raw);\n      results.push({ json: mapped });\n    }\n\n    if (page >= (totalPages ?? page)) break;\n    page++;\n    if (cfg.delayMs > 0) await sleep(cfg.delayMs);\n  }\n\n  return results;\n}\n\n// ── Wejście n8n ───────────────────────────────────────────────────────────────\nconst trigger  = $input.first().json ?? {};\nconst userConf = trigger.config      ?? {};\nconst maxPages = trigger.max_pages   ?? userConf.maxPages ?? DEFAULT_CONFIG.maxPages;\n\nconst cfg = { ...DEFAULT_CONFIG, ...userConf, maxPages };\n\nreturn await scrapeJustJoin.call(this, cfg);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "e4ccdfe0-529d-4b97-a29d-5a2f5cb092ad",
+      "name": "Scrape Offers"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start flow with data": {
+      "main": [
+        [
+          {
+            "node": "Scrape Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Offers": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d6f3844b-cc48-42b2-92f0-975fa9a6ce7b",
+  "meta": {
+    "instanceId": "97481b629537fec29dc17e37e9860b073024f9e9a612443256860c22d1358b72"
+  },
+  "id": "b9i8E2PGRARIic4a",
+  "tags": [
+    {
+      "name": "job-scout",
+      "id": "1Zv2NZKs8qaXM368",
+      "updatedAt": "2026-05-23T11:42:24.098Z",
+      "createdAt": "2026-05-23T11:42:24.098Z"
+    },
+    {
+      "name": "module",
+      "id": "XNxae8FnyCNr8ehu",
+      "updatedAt": "2026-05-23T11:42:24.091Z",
+      "createdAt": "2026-05-23T11:42:24.091Z"
+    },
+    {
+      "name": "justjoin",
+      "id": "muIEFCGT5KrgUA3k",
+      "updatedAt": "2026-05-23T11:42:53.158Z",
+      "createdAt": "2026-05-23T11:42:53.158Z"
+    }
+  ]
+}
